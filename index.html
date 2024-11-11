@@ -1,52 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text Width Measurement</title>
-  <style>
-    /* Invisible div to measure text width */
-    #text-measure {
-      position: absolute;
-      visibility: hidden;
-      white-space: nowrap;
-    }
-  </style>
-</head>
-<body>
-
-  <input type="text" id="userInput" placeholder="Type something here">
-  <button onclick="measureTextWidth()">Measure Width</button>
-  <p>Text width: <span id="textWidth">0</span> pixels</p>
-
-  <!-- Div used to measure text width -->
-  <div id="text-measure"></div>
-
-  <script>
-    function measureTextWidth() {
-      const inputText = document.getElementById('userInput').value;
-
-      // Get the measurement div and set its text content to match the input
-      const textMeasure = document.getElementById('text-measure');
-      textMeasure.textContent = inputText;
-
-      // Copy font styles from input to measurement div
-      const inputElement = document.getElementById('userInput');
-      const style = window.getComputedStyle(inputElement);
-      textMeasure.style.font = style.font;
-      textMeasure.style.fontSize = style.fontSize;
-      textMeasure.style.fontWeight = style.fontWeight;
-      textMeasure.style.fontFamily = style.fontFamily;
-
-      // Measure the width
-      const textWidth = textMeasure.offsetWidth;
-
-      // Display the width
-      document.getElementById('textWidth').textContent = textWidth;
-    }
-  </script>
-<p>
-  Target Width: 222 pixels
-</p>
-</body>
+<html>
+  <body>
+    <a href="/text-width/">Measure Text Width</a>
+    
+  </body>
 </html>
