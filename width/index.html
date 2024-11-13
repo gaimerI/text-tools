@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measure Text Width</title>
+    <style>
+        /* Hidden span to measure text width */
+        #text-measure {
+            position: absolute;
+            visibility: hidden;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="text-input" placeholder="Type something" oninput="measureTextWidth()">
+    <p>Text Width: <span id="text-width">0</span> pixels</p>
+
+    <!-- Hidden element for text measurement -->
+    <span id="text-measure"></span>
+
+    <script>
+        function measureTextWidth() {
+            // Get user input and the hidden measuring span
+            const text = document.getElementById('text-input').value;
+            const textMeasureSpan = document.getElementById('text-measure');
+
+            // Apply styles to the measuring span to match the input
+            const input = document.getElementById('text-input');
+            const style = window.getComputedStyle(input);
+            textMeasureSpan.style.fontFamily = style.fontFamily;
+            textMeasureSpan.style.fontSize = style.fontSize;
+            textMeasureSpan.style.fontWeight = style.fontWeight;
+            textMeasureSpan.style.letterSpacing = style.letterSpacing;
+
+            // Set the text to the span and measure its width
+            textMeasureSpan.textContent = text;
+            const width = textMeasureSpan.offsetWidth;
+
+            // Display the width
+            document.getElementById('text-width').textContent = width;
+        }
+    </script>
+
+</body>
+</html>
