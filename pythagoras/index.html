@@ -8,18 +8,21 @@
 </head>
 <body>
   <div class="calculator">
-    <h1>Pythagorean Theorem Calculator</h1>
-    <button class="button-input" onclick="history.back()">Go Back</button>
-    <div class="input-group">
-      <label for="sideA">Side A:</label>
-      <input type="number" class="number-input" id="sideA" placeholder="Enter side A">
-    </div>
-    <div class="input-group">
-      <label for="sideB">Side B:</label>
-      <input type="number" class="number-input" id="sideB" placeholder="Enter side B">
-    </div>
-    <button class="button-input" onclick="calculateHypotenuse()">Calculate Hypotenuse</button>
-    <p id="result"></p>
+    <h2>Right Triangle Side Calculator</h2>
+    <p>Select the type of sides you have and enter their lengths:</p>
+    
+    <label for="sideType">Known Sides:</label>
+    <select id="sideType">
+        <option value="legs">Two Legs (a and b)</option>
+        <option value="hypotenuseAndLeg">Hypotenuse and One Leg (c and a or b)</option>
+    </select>
+
+    <input type="number" id="side1" placeholder="Enter length of first side" min="0" step="any">
+    <input type="number" id="side2" placeholder="Enter length of second side" min="0" step="any">
+    
+    <button onclick="calculate()">Calculate Missing Side</button>
+    
+    <div id="result" class="result"></div>
   </div>
   <script src="https://gaimeri.github.io/script.js"></script>
 </body>
