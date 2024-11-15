@@ -1,41 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Measure Text Width</title>
-    <link rel="stylesheet" href="/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/style.css">
+<title>Measure Text Width</title>
 </head>
 <body>
 
-    <input type="text" class="text-input" placeholder="Type something" oninput="measureTextWidth()">
-    <p>Text Width: <span id="text-width">0</span> pixels</p>
+<input type="text" id="textInput" placeholder="Type something..." oninput="measureTextWidth()" />
 
-    <!-- Hidden element for text measurement -->
-    <span id="text-measure"></span>
+<p>Text width: <span id="textWidth">0</span> pixels</p>
 
-    <script>
-        function measureTextWidth() {
-            // Get user input and the hidden measuring span
-            const text = document.getElementById('text-input').value;
-            const textMeasureSpan = document.getElementById('text-measure');
+<!-- Hidden span to measure text width -->
+<span id="textWidthSpan"></span>
 
-            // Apply styles to the measuring span to match the input
-            const input = document.getElementById('text-input');
-            const style = window.getComputedStyle(input);
-            textMeasureSpan.style.fontFamily = style.fontFamily;
-            textMeasureSpan.style.fontSize = style.fontSize;
-            textMeasureSpan.style.fontWeight = style.fontWeight;
-            textMeasureSpan.style.letterSpacing = style.letterSpacing;
-
-            // Set the text to the span and measure its width
-            textMeasureSpan.textContent = text;
-            const width = textMeasureSpan.offsetWidth;
-
-            // Display the width
-            document.getElementById('text-width').textContent = width;
-        }
-    </script>
+<script src="/script.js></script>
 
 </body>
 </html>
