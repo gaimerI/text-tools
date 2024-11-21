@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Walk on Grid</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="randomWalkCanvas"></canvas>
+    <script>
+        // Grid and canvas settings
+        const canvas = document.getElementById('randomWalkCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20; // Size of each cell in the grid
+        const gridWidth = 30; // Number of cells horizontally
+        const gridHeight = 30; // Number of cells vertically
+        canvas.width = gridSize * gridWidth;
+        canvas.height = gridSize * gridHeight;
+
+        // Starting point
+        let x = Math.floor(gridWidth / 2);
+        let y = Math.floor(gridHeight / 2);
+
+        // Visited cells
+        const visited = new Set();
+        visited.add(`${x},${y}`);
+
+        // Draw initial grid
+        function drawGrid() {
+            ctx.strokeStyle = '#ddd';
+            for (let i = 0; i <= gridWidth; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= gridHeight; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, j * gridSize);
+                ctx.lineTo(canvas.width, j * gridSize);
+                ctx.stroke();
+            }
+        }
+
+        // Draw a single cell
+        function drawCell(x, y, color = 'blue') {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        }
+
+        // Random walk algorithm
+        function randomWalk() {
+            // Directions: [dx, dy]
+            const directions = [
+                [0, -1], // Up
+                [1, 0],  // Right
+                [0, 1],  // Down
+                [-1, 0]  // Left
+            ];
+
+            // Choose a random direction
+            const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
+            const newX = x + dx;
+            const newY = y + dy;
+
+            // Check if the new position is within bounds
+            if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
+                x = newX;
+                y = newY;
+                const key = `${x},${y}`;
+
+                // Mark the cell as visited
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    drawCell(x, y);
+                }
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            randomWalk();
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        drawGrid();
+        drawCell(x, y, 'red'); // Starting point in red
+        animate();
+    </script>
+</body>
+</html>
