@@ -1,123 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loop-Erased Random Walk</title>
-  <style>
-    canvas {
-      border: 1px solid black;
-      display: block;
-      margin: 20px auto;
-    }
-    body {
-      text-align: center;
-      font-family: Arial, sans-serif;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loop-Erased Random Walk</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
 </head>
 <body>
-  <h1>Loop-Erased Random Walk</h1>
-  <canvas id="lerwCanvas" width="600" height="600"></canvas>
-  <button id="generateButton">Generate Walk</button>
+    <canvas id="lerwCanvas"></canvas>
+    <script>
+        // Grid and canvas settings
+        const canvas = document.getElementById('lerwCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20; // Size of each cell in the grid
+        const gridWidth = 30; // Number of cells horizontally
+        const gridHeight = 30; // Number of cells vertically
+        canvas.width = gridSize * gridWidth;
+        canvas.height = gridSize * gridHeight;
 
-  <script>
-    const canvas = document.getElementById('lerwCanvas');
-    const ctx = canvas.getContext('2d');
+        // Starting point
+        let x = Math.floor(gridWidth / 2);
+        let y = Math.floor(gridHeight / 2);
 
-    const gridSize = 30; // size of grid cells
-    const cols = Math.floor(canvas.width / gridSize);
-    const rows = Math.floor(canvas.height / gridSize);
+        // Stack for the loop-erased random walk
+        const pathStack = [];
+        pathStack.push([x, y]);
 
-    const directions = [
-      { x: 1, y: 0 },  // right
-      { x: -1, y: 0 }, // left
-      { x: 0, y: 1 },  // down
-      { x: 0, y: -1 }  // up
-    ];
-
-    function randomWalk(startX, startY) {
-      const path = [{ x: startX, y: startY }];
-      const visited = new Set();
-      visited.add(`${startX},${startY}`);
-
-      let currentX = startX;
-      let currentY = startY;
-
-      while (true) {
-        const possibleMoves = directions
-          .map(d => ({ x: currentX + d.x, y: currentY + d.y }))
-          .filter(p => p.x >= 0 && p.x < cols && p.y >= 0 && p.y < rows);
-
-        if (possibleMoves.length === 0) break;
-
-        const nextMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        currentX = nextMove.x;
-        currentY = nextMove.y;
-
-        const coord = `${currentX},${currentY}`;
-        if (visited.has(coord)) {
-          // Loop detected, erase it
-          const index = path.findIndex(p => p.x === currentX && p.y === currentY);
-          path.splice(index + 1);
-        } else {
-          path.push({ x: currentX, y: currentY });
-          visited.add(coord);
+        // Draw initial grid
+        function drawGrid() {
+            ctx.strokeStyle = '#ddd';
+            for (let i = 0; i <= gridWidth; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= gridHeight; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, j * gridSize);
+                ctx.lineTo(canvas.width, j * gridSize);
+                ctx.stroke();
+            }
         }
 
-        // End condition for simplicity
-        if (path.length > 300) break;
-      }
-
-      return path;
-    }
-
-    function drawGrid() {
-      ctx.strokeStyle = '#ddd';
-      for (let i = 0; i <= cols; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * gridSize, 0);
-        ctx.lineTo(i * gridSize, canvas.height);
-        ctx.stroke();
-      }
-      for (let i = 0; i <= rows; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i * gridSize);
-        ctx.lineTo(canvas.width, i * gridSize);
-        ctx.stroke();
-      }
-    }
-
-    function drawPath(path) {
-      ctx.strokeStyle = 'blue';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let i = 0; i < path.length; i++) {
-        const { x, y } = path[i];
-        const px = x * gridSize + gridSize / 2;
-        const py = y * gridSize + gridSize / 2;
-        if (i === 0) {
-          ctx.moveTo(px, py);
-        } else {
-          ctx.lineTo(px, py);
+        // Draw a single cell
+        function drawCell(x, y, color = 'blue') {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
         }
-      }
-      ctx.stroke();
-    }
 
-    function generateLERW() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGrid();
-      const startX = Math.floor(cols / 2);
-      const startY = Math.floor(rows / 2);
-      const path = randomWalk(startX, startY);
-      drawPath(path);
-    }
+        // Loop-erased random walk step
+        function loopErasedRandomWalk() {
+            // Directions: [dx, dy]
+            const directions = [
+                [0, -1], // Up
+                [1, 0],  // Right
+                [0, 1],  // Down
+                [-1, 0]  // Left
+            ];
 
-    document.getElementById('generateButton').addEventListener('click', generateLERW);
+            // Choose a random direction
+            const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
+            const newX = x + dx;
+            const newY = y + dy;
 
-    // Initial draw
-    generateLERW();
-  </script>
+            // Check if the new position is within bounds
+            if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
+                x = newX;
+                y = newY;
+
+                // Check if the new position creates a loop
+                const index = pathStack.findIndex(([px, py]) => px === x && py === y);
+                if (index !== -1) {
+                    // Erase the loop by removing elements after the repeated position
+                    pathStack.splice(index + 1);
+                } else {
+                    // Add the new position to the stack
+                    pathStack.push([x, y]);
+                }
+            }
+        }
+
+        // Draw the current path
+        function drawPath() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawGrid(); // Redraw grid
+
+            // Draw the path
+            for (let i = 0; i < pathStack.length; i++) {
+                const [px, py] = pathStack[i];
+                drawCell(px, py, i === 0 ? 'red' : 'blue'); // Start cell in red, others in blue
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            loopErasedRandomWalk();
+            drawPath();
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        drawGrid();
+        drawCell(x, y, 'red'); // Starting point in red
+        animate();
+    </script>
 </body>
 </html>
