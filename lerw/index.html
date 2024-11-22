@@ -36,7 +36,9 @@
 
         // Stack for the loop-erased random walk
         const pathStack = [];
+        const visited = new Set();
         pathStack.push([x, y]);
+        visited.add(`${x},${y}`);
 
         // Draw initial grid
         function drawGrid() {
@@ -81,14 +83,18 @@
                 x = newX;
                 y = newY;
 
-                // Check if the new position creates a loop
+                const key = `${x},${y}`;
                 const index = pathStack.findIndex(([px, py]) => px === x && py === y);
+
                 if (index !== -1) {
-                    // Erase the loop by removing elements after the repeated position
+                    // Erase the loop
                     pathStack.splice(index + 1);
                 } else {
-                    // Add the new position to the stack
-                    pathStack.push([x, y]);
+                    // Add new position
+                    if (!visited.has(key)) {
+                        pathStack.push([x, y]);
+                        visited.add(key);
+                    }
                 }
             }
         }
@@ -109,7 +115,11 @@
         function animate() {
             loopErasedRandomWalk();
             drawPath();
-            requestAnimationFrame(animate);
+
+            // Limit the animation steps
+            if (pathStack.length < gridWidth * gridHeight) {
+                requestAnimationFrame(animate);
+            }
         }
 
         // Initialize
