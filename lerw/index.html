@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loop-Erased Random Walk</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Loop-Erased Random Walk</h1>
+  <canvas id="lerwCanvas" width="600" height="600"></canvas>
+  <button id="generateButton">Generate Walk</button>
+
+  <script>
+    const canvas = document.getElementById('lerwCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const gridSize = 30; // size of grid cells
+    const cols = Math.floor(canvas.width / gridSize);
+    const rows = Math.floor(canvas.height / gridSize);
+
+    const directions = [
+      { x: 1, y: 0 },  // right
+      { x: -1, y: 0 }, // left
+      { x: 0, y: 1 },  // down
+      { x: 0, y: -1 }  // up
+    ];
+
+    function randomWalk(startX, startY) {
+      const path = [{ x: startX, y: startY }];
+      const visited = new Set();
+      visited.add(`${startX},${startY}`);
+
+      let currentX = startX;
+      let currentY = startY;
+
+      while (true) {
+        const possibleMoves = directions
+          .map(d => ({ x: currentX + d.x, y: currentY + d.y }))
+          .filter(p => p.x >= 0 && p.x < cols && p.y >= 0 && p.y < rows);
+
+        if (possibleMoves.length === 0) break;
+
+        const nextMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        currentX = nextMove.x;
+        currentY = nextMove.y;
+
+        const coord = `${currentX},${currentY}`;
+        if (visited.has(coord)) {
+          // Loop detected, erase it
+          const index = path.findIndex(p => p.x === currentX && p.y === currentY);
+          path.splice(index + 1);
+        } else {
+          path.push({ x: currentX, y: currentY });
+          visited.add(coord);
+        }
+
+        // End condition for simplicity
+        if (path.length > 300) break;
+      }
+
+      return path;
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = '#ddd';
+      for (let i = 0; i <= cols; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * gridSize, 0);
+        ctx.lineTo(i * gridSize, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= rows; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, i * gridSize);
+        ctx.lineTo(canvas.width, i * gridSize);
+        ctx.stroke();
+      }
+    }
+
+    function drawPath(path) {
+      ctx.strokeStyle = 'blue';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < path.length; i++) {
+        const { x, y } = path[i];
+        const px = x * gridSize + gridSize / 2;
+        const py = y * gridSize + gridSize / 2;
+        if (i === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+    }
+
+    function generateLERW() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      const startX = Math.floor(cols / 2);
+      const startY = Math.floor(rows / 2);
+      const path = randomWalk(startX, startY);
+      drawPath(path);
+    }
+
+    document.getElementById('generateButton').addEventListener('click', generateLERW);
+
+    // Initial draw
+    generateLERW();
+  </script>
+</body>
+</html>
