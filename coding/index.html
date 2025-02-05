@@ -46,36 +46,36 @@
         const codeInput = document.getElementById('codeInput');
         const highlightedCode = document.getElementById('highlightedCode');
 
-        function highlightCode(code) {
-            // JavaScript Keywords
-            const keywords = /\b(abstract|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|false|finally|for|function|if|import|in|instanceof|let|new|null|return|super|switch|this|throw|try|true|typeof|var|void|while|with|yield)\b/g;
+function highlightCode(code) {
+    // JavaScript Keywords
+    const keywords = /\b(abstract|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|false|finally|for|function|if|import|in|instanceof|let|new|null|return|super|switch|this|throw|true|try|typeof|var|void|while|with|yield)\b/g;
 
-            // Strings (single & double quotes, and template literals)
-            const strings = /(["'`])(?:(?=(\\?))\2.)*?\1/g;
+    // Strings (single & double quotes, and template literals)
+    const strings = /(["'`])(?:(?=(\\?))\2.)*?\1/g;
 
-            // Comments (single-line and multi-line)
-            const comments = /\/\/.*|\/\*[\s\S]*?\*\//g;
+    // Comments (single-line and multi-line)
+    const comments = /\/\/.*|\/\*[\s\S]*?\*\//g;
 
-            // Numbers
-            const numbers = /\b\d+(\.\d+)?\b/g;
+    // Numbers
+    const numbers = /\b\d+(\.\d+)?\b/g;
 
-            // Operators and punctuation
-            const operators = /[=+\-*/%<>!&|^~?:]+/g;
-            const punctuation = /[{}()\[\],.;]/g;
+    // Operators and punctuation
+    const operators = /[=+\-*/%<>!&|^~?:]+/g;
+    const punctuation = /[{}()\[\],.;]/g;
 
-            // Function names (basic approach)
-            const functions = /\b([a-zA-Z_]\w*)\s*(?=\()/g;
+    // Function names (basic approach)
+    const functions = /\b([a-zA-Z_]\w*)\s*(?=\()/g;
 
-            // Apply styles using spans
-            return code
-                .replace(comments, '<span class="comment">$&</span>')
-                .replace(strings, '<span class="string">$&</span>')
-                .replace(keywords, '<span class="keyword">$&</span>')
-                .replace(numbers, '<span class="number">$&</span>')
-                .replace(operators, '<span class="operator">$&</span>')
-                .replace(punctuation, '<span class="punctuation">$&</span>')
-                .replace(functions, '<span class="function">$1</span>');
-        }
+    // Apply styles using spans
+    return code
+        .replace(comments, '<span class="comment">$&</span>')
+        .replace(strings, '<span class="string">$&</span>')
+        .replace(keywords, '<span class="keyword">$&</span>')
+        .replace(numbers, '<span class="number">$&</span>')
+        .replace(functions, '<span class="function">$1</span>')
+        .replace(operators, '<span class="operator">$&</span>')
+        .replace(punctuation, '<span class="punctuation">$&</span>');
+}
 
         function updateHighlight() {
             let code = codeInput.value;
