@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Canvas Shape Drawer</title>
+    <style>
+        canvas {
+          border: 1px solid black;
+          margin-top: 10px;
+        }
+        textarea {
+          width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Draw Shapes on Canvas</h2>
+    <label for="arrayInput">Enter shape array</label><br>
+    <textarea id="arrayInput" rows="6">
+[[1, 65280, 1, 10, 10, 100, 50, 1],
+[2, 255, 2, 200, 70, 30, 0, 2],
+[1, 16711680, 1, 120, 120, 80, 40],
+[2, 0, 2, 300, 200, 40, 40]]
+  </textarea><br>
+    <!-- <button onclick="drawShapes()">Draw Shapes</button> -->
+
+    <canvas id="myCanvas" width="500" height="300"></canvas>
+
+    <script>
+      import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
+      addPondiverseButton();
+      function drawShapes() {
+          const input = document.getElementById('arrayInput').value;
+          let shapes;
+          try {
+            shapes = JSON.parse(input);
+            if (!Array.isArray(shapes) || shapes.some(s => !Array.isArray(s) || s.length < 7)) {
+              alert("Each shape must be an array with at least 7 values.");
+              return;
+            }
+          } catch (e) {
+            alert("Invalid JSON. Please enter a valid array.");
+            return;
+          }
+    
+          const canvas = document.getElementById("myCanvas");
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+          shapes.forEach(shape => {
+            const [type, color, mode, x, y, size1, size2, label] = shape;
+
+            let red = getRedDecimal(color);
+            let green = getGreenDecimal(color);
+            let blue = getBlueDecimal(color);
+
+            ctx.beginPath();
+            ctx.strokeStyle = ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+    
+            if (solveType(type) === "rect") {
+              if (solveMode(mode) === "fill")
+                ctx.fillRect(x, y, size1, size2);
+              else
+                ctx.strokeRect(x, y, size1, size2);
+            } else if (solveType(type) === "circle") {
+                ctx.arc(x, y, size1, 0, Math.PI * 2);
+              if (solveMode(mode) === "fill")
+                ctx.fill();
+              else
+                ctx.stroke();
+            }
+    
+            // Draw label if provided
+            if (label) {
+              ctx.fillStyle = "black";
+              ctx.font = "12px Arial";
+              ctx.fillText(getLabelContent(label), x + 5, y - 5);
+            }
+          });
+        }
+    
+        function getLabelContent(label) { // maybe make these data-driven?
+            switch (label) {
+                case 1: return "tadi web";
+                case 2: return "sample label";
+                case 3: return "rectangle";
+                case 4: return "expected a dynamic value?";
+                default: return "what";
+            }
+        }
+
+        function solveType(type) {
+          switch (type) {
+                case 1: return "rect";
+                case 2: return "circle";
+                default: return "rect";
+          }
+        }
+
+      function solveMode(mode) {
+          switch (mode) {
+                case 1: return "fill";
+                case 2: return "stroke";
+                default: return "fill";
+          }
+      }
+
+      function getRedDecimal(color) {
+        return (color >> 16) & 0xFF;
+      }
+
+      function getGreenDecimal(color) {
+        return (color >> 8) & 0xFF;
+      }
+
+      function getBlueDecimal(color) {
+        return color & 0xFF;
+      }
+
+        addPondiverseButton(() => {
+          return {
+            type: "Arrayer",
+            data: "array art",
+            image: canvas?.toDataURL("image/png"),
+          };
+        });
+
+    </script>
+</body>
+
+</html>
