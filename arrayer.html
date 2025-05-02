@@ -29,8 +29,14 @@
     <canvas id="myCanvas" width="500" height="300"></canvas>
 
     <script>
-      import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
-      addPondiverseButton();
+      import {
+          addPondiverseButton,
+          fetchPondiverseCreations,
+          fetchPondiverseCreation,
+          getPondiverseCreationImageUrl,
+          openPondiverseDialog,
+          closePondiverseDialog
+      } from "https://www.pondiverse.com/pondiverse.js";
       function drawShapes() {
           const input = document.getElementById('arrayInput').value;
           let shapes;
