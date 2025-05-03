@@ -35,21 +35,12 @@
 [2, 0, 2, 300, 200, 40, 40]]
   </textarea><br>
     <button onclick="drawShapes()">Draw Shapes</button>
-    <button onclick="openPondiverseDialog()">Share Creation</button>
 
     <canvas id="myCanvas" width="500" height="300"></canvas>
 
     <script type="module">
       import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
-      addPondiverseButton(() => {
-        return {
-          type: "arrayer",
-          data: document.getElementById("arrayInput").value
-,
-          image: document.getElementById("myCanvas")
-.toDataURL("image/png"),
-        };
-      });
+      
       function drawShapes() {
           const input = document.getElementById('arrayInput').value;
           let shapes;
@@ -116,7 +107,7 @@
                 case 12: return "I love it when my gif has volume controls";
                 case 13: return "please add gifs";
                 case 14: return "trans rights";
-                case 11: return "you had me at 'hello world'";
+                case 15: return "login automatically";
                 default: return "what";
             }
         }
@@ -148,6 +139,14 @@
       function getBlueDecimal(color) {
         return color & 0xFF;
       }
+
+        addPondiverseButton(() => {
+        return {
+          type: "arrayer",
+          data: document.getElementById("arrayInput").value,
+          image: document.getElementById("myCanvas").toDataURL("image/png"),
+        };
+      });
 
     </script>
 </body>
