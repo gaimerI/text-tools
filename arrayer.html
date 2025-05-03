@@ -96,9 +96,18 @@
                     ctx.fill();
                 else
                     ctx.stroke();
+            } else if (solveType(type) === "ellipse") {
+                ctx.ellipse(x, y, size1, size2, 0, 0, Math.PI * 2);
+                if (solveMode(mode) === "fill")
+                    ctx.fill();
+                else
+                    ctx.stroke();
+            } else if (solveType(type) === "line") {
+                ctx.moveTo(x, y);
+                ctx.lineTo(size1, size2);
+                ctx.stroke();
             }
 
-    
             // Draw label if provided
             if (label) {
               ctx.fillStyle = "black";
@@ -125,6 +134,16 @@
                 case 13: return "please add gifs";
                 case 14: return "trans rights";
                 case 15: return "login automatically";
+                case 16: return "constructive feedback";
+                case 17: return "there are no mistakes";
+                case 18: return "jam programming";
+                case 19: return "try it out";
+                case 20: return "available at pondiverse";
+                case 21: return "by the way does this support emojis 😀😃";
+                case 22: return "null pointer reference";
+                case 23: return "please add gifs";
+                case 24: return "embrace death";
+                case 25: return "this is so tadi";
                 default: return "what";
             }
         }
@@ -133,6 +152,9 @@
           switch (type) {
                 case 1: return "rect";
                 case 2: return "circle";
+                case 3: return "triangle";
+                case 4: return "ellipse";
+                case 5: return "line";
                 default: return "rect";
           }
         }
