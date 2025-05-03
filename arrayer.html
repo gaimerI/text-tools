@@ -40,6 +40,10 @@
 
     <script type="module">
       import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
+      window.addPondiverseButton = addPondiverseButton;
+    </script>
+
+    <script>
       
       function drawShapes() {
           const input = document.getElementById('arrayInput').value;
