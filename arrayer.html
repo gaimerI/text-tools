@@ -152,6 +152,27 @@
         };
       });
 
+        window.addEventListener("DOMContentLoaded", () => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const creationUrl = urlParams.get("creation");
+
+          if (creationUrl) {
+            fetch(creationUrl)
+              .then(response => response.json())
+              .then(data => {
+                if (data && data.type === "arrayer" && data.data) {
+                  document.getElementById("arrayInput").value = data.data;
+                  drawShapes();
+                } else {
+                  console.warn("Invalid or missing data in creation.");
+                }
+              })
+              .catch(err => {
+                console.error("Failed to load creation:", err);
+              });
+          }
+        });
+
     </script>
 </body>
 
