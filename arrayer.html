@@ -36,7 +36,7 @@
   </textarea><br>
     <button onclick="drawShapes()">Draw Shapes</button>
 
-    <canvas id="myCanvas" width="500" height="300"></canvas>
+    <canvas id="myCanvas" width="500" height="300">Your browser does not support HTML canvas... :(</canvas>
 
     <button onclick="seeDocs()">Instructions</button>
 
@@ -66,7 +66,7 @@
           ctx.clearRect(0, 0, canvas.width, canvas.height);
     
           shapes.forEach(shape => {
-            const [type, color, mode, x, y, size1, size2, label] = shape;
+            const [type, color, mode, x, y, size1, size2, label, extra] = shape;
 
             let red = getRedDecimal(color);
             let green = getGreenDecimal(color);
@@ -75,48 +75,60 @@
             ctx.beginPath();
             ctx.strokeStyle = ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
     
-            if (solveType(type) === "rect") {
-              if (solveMode(mode) === "fill")
+            if (type === "rect") {
+              if (mode === "fill")
                 ctx.fillRect(x, y, size1, size2);
               else
                 ctx.strokeRect(x, y, size1, size2);
-            } else if (solveType(type) === "circle") {
+            } else if (type === "circle") {
                 ctx.arc(x, y, size1, 0, Math.PI * 2);
-              if (solveMode(mode) === "fill")
+              if (mode === "fill")
                 ctx.fill();
               else
                 ctx.stroke();
-            } else if (solveType(type) === "triangle") {
+            } else if (type === "triangle") {
                 const height = size2 || size1;
                 ctx.moveTo(x, y);
                 ctx.lineTo(x + size1 / 2, y + height);
                 ctx.lineTo(x - size1 / 2, y + height);
                 ctx.closePath();
-                if (solveMode(mode) === "fill")
+                if (mode === "fill")
                     ctx.fill();
                 else
                     ctx.stroke();
-            } else if (solveType(type) === "ellipse") {
+            } else if (type === "ellipse") {
                 ctx.ellipse(x, y, size1, size2, 0, 0, Math.PI * 2);
-                if (solveMode(mode) === "fill")
+                if (mode === "fill")
                     ctx.fill();
                 else
                     ctx.stroke();
-            } else if (solveType(type) === "line") {
+            } else if (type === "line") {
                 ctx.moveTo(x, y);
                 ctx.lineTo(size1, size2);
                 ctx.stroke();
-            }
+            } else if (type === "quadratic") {
+                if (!Array.isArray(extra) || extra.length < 2) {
+                    console.warn("Quadratic shape is missing control points.");
+                    return;
+                }
+                const [controlX, controlY] = extra;
 
-            // Draw label if provided
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(controlX, controlY, size1, size2);
+                ctx.stroke();
+            }
+                
+
+            // label 0 is required to be able to input extra
             if (label) {
               ctx.fillStyle = "black";
               ctx.font = "12px Arial";
-              ctx.fillText(getLabelContent(label), x + 5, y - 5);
+              ctx.fillText(label, x + 5, y - 5);
             }
           });
         }
-    
+
+        /* let code die
         function getLabelContent(label) { // maybe make these data-driven?
             switch (label) {
                 case 1: return "tadi web";
@@ -155,6 +167,7 @@
                 case 3: return "triangle";
                 case 4: return "ellipse";
                 case 5: return "line";
+                case 6: return "quadratic";
                 default: return "rect";
           }
         }
@@ -166,6 +179,7 @@
                 default: return "fill";
           }
       }
+      */
 
       function getRedDecimal(color) {
         return (color >> 16) & 0xFF;
