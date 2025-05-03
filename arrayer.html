@@ -35,11 +35,21 @@
 [2, 0, 2, 300, 200, 40, 40]]
   </textarea><br>
     <button onclick="drawShapes()">Draw Shapes</button>
-    <button onclick="share()">Share Creation</button>
+    <button onclick="openPondiverseDialog()">Share Creation</button>
 
     <canvas id="myCanvas" width="500" height="300"></canvas>
 
-    <script>
+    <script type="module">
+      import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
+      addPondiverseButton(() => {
+        return {
+          type: "arrayer",
+          data: document.getElementById("arrayInput").value
+,
+          image: document.getElementById("myCanvas")
+.toDataURL("image/png"),
+        };
+      });
       function drawShapes() {
           const input = document.getElementById('arrayInput').value;
           let shapes;
@@ -138,21 +148,6 @@
       function getBlueDecimal(color) {
         return color & 0xFF;
       }
-
-        function share() {
-            fetch("https://pondiverse.val.run/add-creation", {
-                method: "POST",
-                body: JSON.stringify({
-                    title: "Test",
-                    type: "Arrayer",
-                    data: input.textContent,
-                    image: ctx.getImageData(0, 0, 500, 300)
-                }),
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-            });
-        }
 
     </script>
 </body>
