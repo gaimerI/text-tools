@@ -86,7 +86,18 @@
                 ctx.fill();
               else
                 ctx.stroke();
+            } else if (solveType(type) === "triangle") {
+                const height = size2 || size1;
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + size1 / 2, y + height);
+                ctx.lineTo(x - size1 / 2, y + height);
+                ctx.closePath();
+                if (solveMode(mode) === "fill")
+                    ctx.fill();
+                else
+                    ctx.stroke();
             }
+
     
             // Draw label if provided
             if (label) {
