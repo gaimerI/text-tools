@@ -38,6 +38,8 @@
 
     <canvas id="myCanvas" width="500" height="300"></canvas>
 
+    <button onclick="seeDocs()">Instructions</button>
+
     <script type="module">
       import { addPondiverseButton } from "https://www.pondiverse.com/pondiverse.js";
       window.addPondiverseButton = addPondiverseButton;
@@ -175,6 +177,9 @@
       });
         });
 
+    function seeDocs() {
+        alert("Documentation:\n\n[shape, colour, mode, x, y, width, height, (label)]\n\n Label is optional.");
+    }
     </script>
 </body>
 
