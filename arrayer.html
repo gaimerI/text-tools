@@ -144,13 +144,7 @@
         return color & 0xFF;
       }
 
-        addPondiverseButton(() => {
-        return {
-          type: "arrayer",
-          data: document.getElementById("arrayInput").value,
-          image: document.getElementById("myCanvas").toDataURL("image/png"),
-        };
-      });
+        
 
         window.addEventListener("DOMContentLoaded", () => {
           const urlParams = new URLSearchParams(window.location.search);
@@ -171,6 +165,14 @@
                 console.error("Failed to load creation:", err);
               });
           }
+
+            addPondiverseButton(() => {
+        return {
+          type: "arrayer",
+          data: document.getElementById("arrayInput").value,
+          image: document.getElementById("myCanvas").toDataURL("image/png"),
+        };
+      });
         });
 
     </script>
