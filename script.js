@@ -5,8 +5,8 @@ function drawShapes() {
   
   try {
     shapes = JSON.parse(input);
-    if (!Array.isArray(shapes) || shapes.some(s => !Array.isArray(s) || s.length < 7)) {
-      alert("Each shape must be an array with at least 7 values.");
+    if (!Array.isArray(shapes) || shapes.some(s => !Array.isArray(s))) {
+      alert("Each shape must be an array.");
       return;
     }
   }
@@ -64,6 +64,7 @@ function drawShapes() {
       ctx.stroke();
       
     } else if (type === "quadratic") {
+      
       if (!arrayLengthCheck(extra, 2)) {
         alert("Quadratic shape is missing control points.");
         return;
@@ -73,6 +74,14 @@ function drawShapes() {
       ctx.quadraticCurveTo(controlX, controlY, size1, size2);
       ctx.stroke();
       
+    } else if (type === "translation") {
+      
+      ctx.translate(x, y);
+
+    } else if (type === "rotation") {
+
+      ctx.rotate(x)
+
     }
     
     // label 0 is required to be able to input extra
@@ -86,9 +95,9 @@ function drawShapes() {
 
 function arrayLengthCheck(array, length) {
   if (!Array.isArray(array) || array.length < length) {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
 /* let code die
 
