@@ -81,9 +81,10 @@ function drawShapes() {
       ctx.font = "12px Arial";
       ctx.fillText(label, x + 5, y - 5);
     }
+    ctx.restore(); // I presume it needs to be here?
   }
 
-  ctx.restore(); // Restore to pre-transform state
+  
 });
 
 }
