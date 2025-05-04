@@ -21,28 +21,33 @@ function drawShapes() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   shapes.forEach(shape => {
-    const [type, color, mode, x, y, size1, size2, label, extra] = shape;
-    
-    let red = getRedDecimal(color);
-    let green = getGreenDecimal(color);
-    let blue = getBlueDecimal(color);
-    
-    ctx.beginPath();
-    ctx.strokeStyle = ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
-    
+  const [type, color, mode, x, y, size1, size2, label, extra] = shape;
+
+  ctx.save(); // Save canvas state BEFORE transformations
+
+  let red = getRedDecimal(color);
+  let green = getGreenDecimal(color);
+  let blue = getBlueDecimal(color);
+
+  ctx.beginPath();
+  ctx.strokeStyle = ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+
+  if (type === "translation") {
+    ctx.translate(x, y);
+  } else if (type === "rotation") {
+    ctx.rotate(x);
+  }
+
+  // draw shape only if it's not a transformation type
+  if (["rect", "circle", "triangle", "ellipse", "line", "quadratic"].includes(type)) {
     if (type === "rect") {
-      
       if (mode === "fill") ctx.fillRect(x, y, size1, size2);
       else ctx.strokeRect(x, y, size1, size2);
-      
     } else if (type === "circle") {
-      
       ctx.arc(x, y, size1, 0, Math.PI * 2);
       if (mode === "fill") ctx.fill();
       else ctx.stroke();
-      
     } else if (type === "triangle") {
-      
       const height = size2 || size1;
       ctx.moveTo(x, y);
       ctx.lineTo(x + size1 / 2, y + height);
@@ -50,47 +55,37 @@ function drawShapes() {
       ctx.closePath();
       if (mode === "fill") ctx.fill();
       else ctx.stroke();
-      
     } else if (type === "ellipse") {
-      
       ctx.ellipse(x, y, size1, size2, 0, 0, Math.PI * 2);
       if (mode === "fill") ctx.fill();
       else ctx.stroke();
-      
     } else if (type === "line") {
-      
       ctx.moveTo(x, y);
       ctx.lineTo(size1, size2);
       ctx.stroke();
-      
     } else if (type === "quadratic") {
-      
       if (!arrayLengthCheck(extra, 2)) {
         alert("Quadratic shape is missing control points.");
+        ctx.restore();
         return;
       }
       const [controlX, controlY] = extra;
       ctx.moveTo(x, y);
       ctx.quadraticCurveTo(controlX, controlY, size1, size2);
       ctx.stroke();
-      
-    } else if (type === "translation") {
-      
-      ctx.translate(x, y);
-
-    } else if (type === "rotation") {
-
-      ctx.rotate(x)
-
     }
-    
-    // label 0 is required to be able to input extra
+
+    // Add label
     if (label) {
       ctx.fillStyle = "black";
       ctx.font = "12px Arial";
       ctx.fillText(label, x + 5, y - 5);
     }
-  });
+  }
+
+  ctx.restore(); // Restore to pre-transform state
+});
+
 }
 
 function arrayLengthCheck(array, length) {
