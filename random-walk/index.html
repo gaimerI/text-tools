@@ -9,6 +9,7 @@
 <body>
     <canvas id="randomWalkCanvas"></canvas>
     <script>
+        let stepCount = 0
         // Grid and canvas settings
         const canvas = document.getElementById('randomWalkCanvas');
         const ctx = canvas.getContext('2d');
@@ -76,9 +77,14 @@
                 // Mark the cell as visited
                 if (!visited.has(key)) {
                     visited.add(key);
-                    drawCell(x, y);
+                    drawCell(x, y, getColorFromStep(stepCount++));
                 }
             }
+        }
+
+        function getColorFromStep(step) {
+            const hue = (step * 2) % 360; // slowly rotate through color wheel
+            return `hsl(${hue}, 80%, 50%)`;
         }
 
         // Animation loop
