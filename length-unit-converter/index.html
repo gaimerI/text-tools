@@ -7,36 +7,36 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
+  <div>
+    <div>
       <header>
         <div>
           <h1>Length Unit Converter</h1>
-          <p class="lead">Convert between arbitrary length units. Add your own units (relative to meters).</p>
+          <p>Convert between arbitrary length units. Add your own units (relative to meters).</p>
         </div>
         <div class="tools">
-          <button id="swap" class="ghost" title="Swap units">⇄ Swap</button>
-          <button id="copyBtn" class="ghost" title="Copy result">Copy</button>
-          <button id="resetBtn" class="ghost" title="Reset custom units">Reset</button>
+          <button>⇄ Swap</button>
+          <button>Copy</button>
+          <button>Reset Customs</button>
         </div>
       </header>
 
-      <div class="row">
+      <div>
         <div>
           <label for="fromValue">Value</label>
-          <div class="field">
+          <div>
             <input id="fromValue" type="text" inputmode="decimal" placeholder="Enter a number (e.g. 12.5 or 1e3)" value="1">
           </div>
 
           <label for="fromUnit" style="margin-top:10px">From unit</label>
-          <div class="field">
+          <div>
             <select id="fromUnit"></select>
           </div>
         </div>
 
         <div>
           <label for="toUnit">To unit</label>
-          <div class="field">
+          <div>
             <select id="toUnit"></select>
           </div>
 
@@ -45,10 +45,10 @@
         </div>
       </div>
 
-      <div class="bottom">
-        <div class="muted small">Supports scientific notation and fractional values.</div>
+      <div>
+        <div>Supports scientific notation and fractional values.</div>
         <div>
-          <button id="convertBtn" class="btn">Convert</button>
+          <button id="convertBtn">Convert</button>
         </div>
       </div>
 
@@ -59,8 +59,8 @@
           <input id="customFactor" placeholder="Meters per unit (e.g. 201.168)" inputmode="decimal">
           <button id="addCustom" class="btn">Add</button>
         </div>
-        <div class="muted small" style="margin-top:8px">Custom units are saved in your browser (localStorage).</div>
-        <div class="list" id="customList" aria-live="polite"></div>
+        <div style="margin-top:8px">Custom units are saved in your browser (localStorage).</div>
+        <div id="customList" aria-live="polite"></div>
       </section>
 
     </div>
@@ -69,19 +69,38 @@
   <script>
     // Predefined unit map (unit name -> meters per unit)
     const defaultUnits = {
-      "meter (m)": 1,
-      "kilometer (km)": 1000,
-      "centimeter (cm)": 0.01,
-      "millimeter (mm)": 0.001,
-      "micrometer (μm)": 1e-6,
-      "nanometer (nm)": 1e-9,
+      "quettametre (Qm)": 1e30,
+      "ronnametre (Rm)": 1e27,
+      "yottametre (Ym)": 1e24,
+      "zettametre (Zm)": 1e21,
+      "exametre (Em)": 1e18,
+      "petametre (Pm)": 1e15,
+      "terametre (Tm)": 1e12,
+      "gigametre (Gm)": 1e9,
+      "megametre (Mm)": 1e6,
+      "kilometre (km)": 1000,
+      "hectometre (hm)": 100,
+      "decametre (dam)": 10,
+      "metre (m)": 1,
+      "decimetre (dm)": 0.1,
+      "centimetre (cm)": 0.01,
+      "millimetre (mm)": 0.001,
+      "micrometre (μm)": 1e-6,
+      "nanometre (nm)": 1e-9,
+      "picometre (pm)": 1e-12,
+      "femtometre (fm)": 1e-15,
+      "attometre (am)": 1e-18,
+      "zeptometre (zm)": 1e-21,
+      "yoctometre (ym)": 1e-24,
+      "rontometre (rm)": 1e-27,
+      "quectometre (qm)": 1e-30,
       "inch (in)": 0.0254,
       "foot (ft)": 0.3048,
       "yard (yd)": 0.9144,
       "mile (mi)": 1609.344,
       "nautical mile (nmi)": 1852,
       "light-year (ly)": 9.46073e15,
-      "astronomical unit (au)": 1.495978707e11
+      "astronomical unit (au)": 1.495978707e11,
     };
 
     const LS_KEY = 'length-converter-custom-units-v1';
@@ -167,17 +186,23 @@
       const val = parseInputValue(valText);
       if(isNaN(val)){
         resultEl.textContent = 'Invalid input';
+        resultEl.classList.add('warn');
+        resultEl.classList.remove('success');
         return;
       }
       const from = units[fromUnit.value];
       const to = units[toUnit.value];
       if(typeof from !== 'number' || typeof to !== 'number'){
         resultEl.textContent = 'Unknown unit';
+        resultEl.classList.add('warn');
+        resultEl.classList.remove('success');
         return;
       }
       const meters = val * from;
       const out = meters / to;
       resultEl.textContent = `${formatNumber(out)} ${toUnit.value}`;
+      resultEl.classList.add('success');
+      resultEl.classList.remove('warn');
     }
 
     function addCustomUnit(){
