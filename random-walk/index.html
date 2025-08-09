@@ -13,8 +13,11 @@
         const canvas = document.getElementById('randomWalkCanvas');
         const ctx = canvas.getContext('2d');
         const gridSize = 20; // Size of each cell in the grid
-        const gridWidth = 30; // Number of cells horizontally
-        const gridHeight = 30; // Number of cells vertically
+
+        // Calculate grid dimensions based on the screen size
+        const gridWidth = Math.floor(window.innerWidth / gridSize);
+        const gridHeight = Math.floor(window.innerHeight / gridSize);
+
         canvas.width = gridSize * gridWidth;
         canvas.height = gridSize * gridHeight;
 
