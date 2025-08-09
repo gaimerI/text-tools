@@ -6,12 +6,17 @@ function analyzeNumber() {
   
   if (isNaN(number) || !Number.isInteger(number) || number <= 0) {
     resultElement.textContent = "Please enter a positive integer.";
+    resultElement.classList.add('warn');
+    resultElement.classList.remove('success');
     return;
   }
   
   let result = schizophrenise(number);
   result = Math.sqrt(result);
   resultElement.textContent = result;
+  resultElement.classList.add('success');
+  resultElement.classList.remove('warn');
+  
 }
 
 function schizophrenise(number) {
