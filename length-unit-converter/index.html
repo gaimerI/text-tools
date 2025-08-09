@@ -15,9 +15,11 @@
           <p>Convert between arbitrary length units. Add your own units (relative to meters).</p>
         </div>
         <div class="tools">
-          <button>⇄ Swap</button>
-          <button>Copy</button>
-          <button>Reset Customs</button>
+          <div class="tools">
+            <button id="swap">⇄ Swap</button>
+            <button id="copyBtn">Copy</button>
+            <button id="resetBtn">Reset Customs</button>
+          </div>
         </div>
       </header>
 
@@ -294,8 +296,8 @@
     // initialization
     populateUnitSelects(); renderCustomList();
     // set defaults
-    fromUnit.value = 'meter (m)';
-    toUnit.value = 'kilometer (km)';
+    fromUnit.value = 'metre (m)';
+    toUnit.value = 'kilometre (km)';
     convert();
 
     // expose a little debug on window (optional)
