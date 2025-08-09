@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Length Unit Converter</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#60a5fa;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#061025 0%, #08233d 100%); color:#e6eef8}
+    .wrap{width:100%; max-width:920px; padding:28px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:20px; box-shadow:0 6px 30px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px}
+    h1{font-size:20px; margin:0}
+    p.lead{margin:0; color:var(--muted); font-size:13px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+    label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+
+    .field{background:var(--glass); border-radius:10px; padding:12px; display:flex; gap:8px; align-items:center}
+    input[type="number"], input[type="text"], select{background:transparent; border:none; outline:none; color:inherit; font-size:16px; width:100%}
+    button.btn{background:var(--accent); color:#06253a; border:none; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600}
+    button.ghost{background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); padding:8px 10px; border-radius:8px; cursor:pointer}
+    .tools{display:flex; gap:8px}
+    .result{margin-top:14px; padding:12px; border-radius:10px; background:rgba(255,255,255,0.015); border:1px solid rgba(255,255,255,0.03)}
+    .muted{color:var(--muted); font-size:13px}
+    .small{font-size:12px}
+
+    .custom-area{margin-top:12px; display:flex; gap:8px; align-items:center}
+    .custom-area input{padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:transparent}
+    .bottom{display:flex; justify-content:space-between; align-items:center; margin-top:12px}
+    .list{max-height:120px; overflow:auto; margin-top:10px; padding:8px; border-radius:8px; border:1px dashed rgba(255,255,255,0.03)}
+    .unit-item{display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px}
+    .unit-item button{background:transparent; border:none; color:var(--muted); cursor:pointer}
+
+    @media (max-width:700px){.row{grid-template-columns:1fr} header{flex-direction:column; align-items:flex-start} .tools{width:100%; justify-content:space-between}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div>
+          <h1>Length Unit Converter</h1>
+          <p class="lead">Convert between arbitrary length units. Add your own units (relative to meters).</p>
+        </div>
+        <div class="tools">
+          <button id="swap" class="ghost" title="Swap units">⇄ Swap</button>
+          <button id="copyBtn" class="ghost" title="Copy result">Copy</button>
+          <button id="resetBtn" class="ghost" title="Reset custom units">Reset</button>
+        </div>
+      </header>
+
+      <div class="row">
+        <div>
+          <label for="fromValue">Value</label>
+          <div class="field">
+            <input id="fromValue" type="text" inputmode="decimal" placeholder="Enter a number (e.g. 12.5 or 1e3)" value="1">
+          </div>
+
+          <label for="fromUnit" style="margin-top:10px">From unit</label>
+          <div class="field">
+            <select id="fromUnit"></select>
+          </div>
+        </div>
+
+        <div>
+          <label for="toUnit">To unit</label>
+          <div class="field">
+            <select id="toUnit"></select>
+          </div>
+
+          <label style="margin-top:10px">Result</label>
+          <div class="result" id="result">—</div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="muted small">Supports scientific notation and fractional values.</div>
+        <div>
+          <button id="convertBtn" class="btn">Convert</button>
+        </div>
+      </div>
+
+      <section style="margin-top:16px">
+        <h3 style="margin:0 0 8px 0; font-size:14px">Manage custom units</h3>
+        <div class="custom-area">
+          <input id="customName" placeholder="Unit name (e.g. furlong)">
+          <input id="customFactor" placeholder="Meters per unit (e.g. 201.168)" inputmode="decimal">
+          <button id="addCustom" class="btn">Add</button>
+        </div>
+        <div class="muted small" style="margin-top:8px">Custom units are saved in your browser (localStorage).</div>
+        <div class="list" id="customList" aria-live="polite"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    // Predefined unit map (unit name -> meters per unit)
+    const defaultUnits = {
+      "meter (m)": 1,
+      "kilometer (km)": 1000,
+      "centimeter (cm)": 0.01,
+      "millimeter (mm)": 0.001,
+      "micrometer (μm)": 1e-6,
+      "nanometer (nm)": 1e-9,
+      "inch (in)": 0.0254,
+      "foot (ft)": 0.3048,
+      "yard (yd)": 0.9144,
+      "mile (mi)": 1609.344,
+      "nautical mile (nmi)": 1852,
+      "light-year (ly)": 9.46073e15,
+      "astronomical unit (au)": 1.495978707e11
+    };
+
+    const LS_KEY = 'length-converter-custom-units-v1';
+
+    // Get saved custom units from localStorage
+    function loadCustomUnits(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return {};
+        const parsed = JSON.parse(raw);
+        if(typeof parsed === 'object' && parsed !== null) return parsed;
+      }catch(e){console.warn('Failed to load custom units', e)}
+      return {};
+    }
+
+    function saveCustomUnits(obj){
+      try{ localStorage.setItem(LS_KEY, JSON.stringify(obj)); }catch(e){console.warn('Failed to save custom units', e)}
+    }
+
+    let units = {...defaultUnits, ...loadCustomUnits()};
+
+    const fromUnit = document.getElementById('fromUnit');
+    const toUnit = document.getElementById('toUnit');
+    const fromValue = document.getElementById('fromValue');
+    const resultEl = document.getElementById('result');
+    const convertBtn = document.getElementById('convertBtn');
+    const swapBtn = document.getElementById('swap');
+    const addCustomBtn = document.getElementById('addCustom');
+    const customName = document.getElementById('customName');
+    const customFactor = document.getElementById('customFactor');
+    const customList = document.getElementById('customList');
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function populateUnitSelects(){
+      // create sorted array by readable name
+      const keys = Object.keys(units).sort((a,b)=>a.localeCompare(b));
+      [fromUnit, toUnit].forEach(select => {
+        // remember selected value
+        const prev = select.value;
+        select.innerHTML = '';
+        keys.forEach(key => {
+          const opt = document.createElement('option');
+          opt.value = key;
+          opt.textContent = key;
+          select.appendChild(opt);
+        });
+        if(keys.includes(prev)) select.value = prev;
+      });
+    }
+
+    function formatNumber(n){
+      // present in best format: up to 12 significant digits
+      if(!isFinite(n)) return '∞';
+      const abs = Math.abs(n);
+      if((abs !== 0 && (abs < 1e-3 || abs >= 1e6)) || Math.abs(Math.round(n) - n) > 1e-9){
+        // scientific if tiny or huge or fractional
+        return Number.parseFloat(n).toPrecision(12).replace(/(?:\.0+|(?:(\.[0-9]+?)0+))$/,'$1');
+      }
+      return Number(n).toLocaleString(undefined, {maximumFractionDigits:12});
+    }
+
+    function parseInputValue(text){
+      // Accept things like '1e3', '1.2', '3/4'
+      text = text.trim();
+      if(text === '') return NaN;
+      // fraction like 3/4
+      if(text.includes('/')){
+        const parts = text.split('/').map(s=>s.trim());
+        if(parts.length === 2){
+          const a = Number(parts[0]);
+          const b = Number(parts[1]);
+          if(isFinite(a) && isFinite(b) && b !== 0) return a/b;
+        }
+        return NaN;
+      }
+      const v = Number(text);
+      return isFinite(v) ? v : NaN;
+    }
+
+    function convert(){
+      const valText = fromValue.value;
+      const val = parseInputValue(valText);
+      if(isNaN(val)){
+        resultEl.textContent = 'Invalid input';
+        return;
+      }
+      const from = units[fromUnit.value];
+      const to = units[toUnit.value];
+      if(typeof from !== 'number' || typeof to !== 'number'){
+        resultEl.textContent = 'Unknown unit';
+        return;
+      }
+      const meters = val * from;
+      const out = meters / to;
+      resultEl.textContent = `${formatNumber(out)} ${toUnit.value}`;
+    }
+
+    function addCustomUnit(){
+      const name = customName.value.trim();
+      const factorText = customFactor.value.trim();
+      if(!name){ alert('Please enter a unit name'); return; }
+      // avoid name collision with predefined
+      if(defaultUnits.hasOwnProperty(name)){
+        alert('That name conflicts with a predefined unit. Choose a different name.');
+        return;
+      }
+      const factor = parseInputValue(factorText);
+      if(isNaN(factor) || factor <= 0){ alert('Please enter a positive numeric meters-per-unit value (e.g. 201.168)'); return; }
+      // update units and UI
+      units[name] = factor;
+      // save only custom units to localStorage (exclude defaults)
+      const custom = {};
+      Object.keys(units).forEach(k=>{ if(!defaultUnits.hasOwnProperty(k)) custom[k] = units[k]; });
+      saveCustomUnits(custom);
+      populateUnitSelects();
+      renderCustomList();
+      customName.value = ''; customFactor.value = '';
+      // select the newly added unit
+      fromUnit.value = name;
+      convert();
+    }
+
+    function renderCustomList(){
+      const keys = Object.keys(units).filter(k=>!defaultUnits.hasOwnProperty(k)).sort((a,b)=>a.localeCompare(b));
+      customList.innerHTML = '';
+      if(keys.length === 0){ customList.textContent = 'No custom units added.'; return; }
+      keys.forEach(k => {
+        const row = document.createElement('div');
+        row.className = 'unit-item';
+        const left = document.createElement('div');
+        left.textContent = `${k} — ${units[k]} m/unit`;
+        const btns = document.createElement('div');
+        const del = document.createElement('button'); del.textContent = 'Delete';
+        del.addEventListener('click', ()=>{
+          if(!confirm(`Delete custom unit "${k}"?`)) return;
+          delete units[k];
+          const custom = {};
+          Object.keys(units).forEach(kk=>{ if(!defaultUnits.hasOwnProperty(kk)) custom[kk] = units[kk]; });
+          saveCustomUnits(custom);
+          populateUnitSelects(); renderCustomList();
+        });
+        const setFrom = document.createElement('button'); setFrom.textContent = 'Use'; setFrom.style.marginLeft='8px';
+        setFrom.addEventListener('click', ()=>{ fromUnit.value = k; convert(); });
+        btns.appendChild(del); btns.appendChild(setFrom);
+        row.appendChild(left); row.appendChild(btns);
+        customList.appendChild(row);
+      });
+    }
+
+    // swap
+    swapBtn.addEventListener('click', ()=>{
+      const a = fromUnit.value; fromUnit.value = toUnit.value; toUnit.value = a;
+      // attempt to convert in new direction
+      convert();
+    });
+
+    // copy
+    copyBtn.addEventListener('click', ()=>{
+      const text = resultEl.textContent;
+      if(!text || text.trim() === '—') return;
+      navigator.clipboard?.writeText(text).then(()=>{
+        copyBtn.textContent = 'Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200);
+      }, ()=>{ alert('Copy failed — your browser may block clipboard access.'); });
+    });
+
+    // reset custom units
+    resetBtn.addEventListener('click', ()=>{
+      if(!confirm('Reset and remove all custom units?')) return;
+      units = {...defaultUnits};
+      saveCustomUnits({});
+      populateUnitSelects(); renderCustomList();
+      convert();
+    });
+
+    // attach events
+    convertBtn.addEventListener('click', convert);
+    fromValue.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') convert(); });
+    addCustomBtn.addEventListener('click', addCustomUnit);
+
+    // live convert when selecting different units
+    fromUnit.addEventListener('change', convert);
+    toUnit.addEventListener('change', convert);
+
+    // initialization
+    populateUnitSelects(); renderCustomList();
+    // set defaults
+    fromUnit.value = 'meter (m)';
+    toUnit.value = 'kilometer (km)';
+    convert();
+
+    // expose a little debug on window (optional)
+    window.lengthConverter = {
+      units, getUnits: ()=>units, setUnit: (name, meters)=>{ units[name]=meters; saveCustomUnits(Object.fromEntries(Object.entries(units).filter(([k])=>!defaultUnits[k]))); populateUnitSelects(); renderCustomList(); }
+    };
+  </script>
+</body>
+</html>
