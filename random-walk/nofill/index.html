@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Walk with Fill</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <canvas id="randomWalkCanvas"></canvas>
+    <script>
+        let stepCount = 0
+        const canvas = document.getElementById('randomWalkCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+      
+        const gridWidth = Math.floor(window.innerWidth / gridSize);
+        const gridHeight = Math.floor(window.innerHeight / gridSize);
+
+        canvas.width = gridSize * gridWidth;
+        canvas.height = gridSize * gridHeight;
+
+        let x = Math.floor(gridWidth / 2);
+        let y = Math.floor(gridHeight / 2);
+
+        const visited = new Set();
+        visited.add(`${x},${y}`);
+
+        function drawGrid() {
+            ctx.strokeStyle = '#ddd';
+            for (let i = 0; i <= gridWidth; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j <= gridHeight; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, j * gridSize);
+                ctx.lineTo(canvas.width, j * gridSize);
+                ctx.stroke();
+            }
+        }
+
+        // Draw a single cell
+        function drawCell(x, y, color = 'blue') {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        }
+
+        // Random walk algorithm
+        function randomWalk() {
+            // Directions: [dx, dy]
+            const directions = [
+                [0, -1], // Up
+                [1, 0],  // Right
+                [0, 1],  // Down
+                [-1, 0]  // Left
+            ];
+
+            // Choose a random direction
+            const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
+            const newX = x + dx;
+            const newY = y + dy;
+
+            // Check if the new position is within bounds
+            if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
+                x = newX;
+                y = newY;
+                const key = `${x},${y}`;
+
+                // Mark the cell as visited
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    drawCell(x, y, getColorFromStep(stepCount++));
+                }
+            }
+        }
+
+        function getColorFromStep(step) {
+            const hue = (step * 2) % 360; // slowly rotate through color wheel
+            return `hsl(${hue}, 80%, 50%)`;
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            randomWalk();
+            drawCell(x, y, 'red');
+            requestAnimationFrame(animate);
+        }
+      
+        drawGrid();
+        drawCell(x, y, 'red');
+        animate();
+    </script>
+</body>
+</html>
