@@ -14,15 +14,24 @@
   <!-- Search -->
   <div class="mb-6 flex gap-2">
     <input id="searchInput" type="text" placeholder="Search news..." 
-           class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400">
+      class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400">
+    <select id="langSelect" class="p-3 border rounded-lg shadow-sm">
+      <option value="en-GB">English (UK)</option>
+      <option value="en-US">English (US)</option>
+      <option value="fi-FI">Suomi (FI)</option>
+      <option value="fr-FR">Français (FR)</option>
+      <option value="de-DE">Deutsch (DE)</option>
+      <option value="es-ES">Español (ES)</option>
+    
+    </select>
     <button onclick="loadFeed()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Refresh</button>
   </div>
 
-  <!-- News Container -->
   <div id="newsContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
 
   <script>
     const FEED_URL = "https://news.google.com/rss?hl=en-GB";
+    let cachedItems = [];
 
     async function loadFeed() {
       try {
@@ -31,8 +40,8 @@
         const parser = new DOMParser();
         const xml = parser.parseFromString(data.contents, "text/xml");
 
-        const items = [...xml.querySelectorAll("item")];
-        renderNews(items);
+        cachedItems = [...xml.querySelectorAll("item")];
+        renderNews(cachedItems);
       } catch (error) {
         document.getElementById("newsContainer").innerHTML = `<p class='text-red-600'>Failed to load feed :(</p>`;
         console.error(error);
@@ -49,7 +58,7 @@
         .forEach(item => {
           const title = item.querySelector("title").textContent;
           const link = item.querySelector("link").textContent;
-          const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleString();
+          const pubDate = timeAgo(new Date(item.querySelector("pubDate").textContent));
           const source = item.querySelector("source")?.textContent || "Unknown";
           const description = item.querySelector("description")?.textContent || "";
 
@@ -65,8 +74,18 @@
         });
     }
 
-    document.getElementById("searchInput").addEventListener("input", loadFeed);
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      const intervals = { year:31536000, month:2592000, day:86400, hour:3600, minute:60 };
+      for (let key in intervals) {
+        const value = Math.floor(seconds / intervals[key]);
+        if (value >= 1) return `${value} ${key}${value > 1 ? "s" : ""} ago`;
+      }
+      return "Just now :)";
+    }
 
+
+    document.getElementById("searchInput").addEventListener("input", () => renderNews(cachedItems));
     loadFeed();
   </script>
 </body>
