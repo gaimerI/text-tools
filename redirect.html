@@ -48,8 +48,10 @@
     var link = document.getElementById('link');
     if (err === 'missing') {
       msg.textContent = 'No destination URL provided. Add ?url=https://example.com to the address bar.';
+      msg.classlist.add("error");
     } else if (err === 'invalid-scheme') {
       msg.textContent = 'Destination URL must start with http:// or https://.';
+      msg.classlist.add("error");
     } else {
       var params = new URLSearchParams(window.location.search);
       var dest = params.get('url');
