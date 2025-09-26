@@ -50,11 +50,11 @@
 
           <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px">
 
-          <label>Nerf selection (choose the single most specific applicable)</label>
+          <label>Nerf</label>
           <select id="nerfSelect">
             <option value="1">None (1)</option>
             <option value="0.91">CP ≥ 4000 at L40 max IVs (0.91)</option>
-            <option value="0.97">Primal Pokémon (0.97)</option>
+            <option value="0.97">Primal (0.97)</option>
             <option value="1_mega">Mega evolved (1)</option>
           </select>
           <div style="height:10px"></div>
@@ -88,7 +88,24 @@
               <label class="muted">Defense IV</label>
               <input id="iv_def" class="small" type="number" min="0" max="15" value="15">
             </div>
+            <div>
+              <label class="muted">SpAtk IV</label>
+              <input id="iv_spatk" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+            </div>
           </div>
+
+          <div style="height:8px"></div>
+          <div class="two">
+            <div>
+              <label class="muted">SpDef IV</label>
+              <input id="iv_spdef" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+            </div>
+            <div>
+              <label class="muted">Speed IV</label>
+              <input id="iv_speed" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+            </div>
+          </div>
+
           <div style="height:14px"></div>
           <div class="row">
             <button id="calc" class="btn">Calculate</button>
@@ -109,7 +126,7 @@
               <tr><td>Base Attack</td><td id="res_atkg">—</td></tr>
               <tr><td>Base Defense</td><td id="res_defg">—</td></tr>
               <tr><td>Selected CPM</td><td id="res_cpm">—</td></tr>
-              <tr><td>Final HP (base+IV)×CPM</td><td id="res_hp_final">—</td></tr>
+              <tr><td>Final HP</td><td id="res_hp_final">—</td></tr>
               <tr><td>Final Attack</td><td id="res_atk_final">—</td></tr>
               <tr><td>Final Defense</td><td id="res_def_final">—</td></tr>
               <tr><td>CP (floor)</td><td id="res_cp" style="font-weight:700">—</td></tr>
@@ -204,9 +221,9 @@
     getEl('res_cp').textContent = cpVal;
 
     getEl('details').textContent = `Inputs: HP=${HP}, Atk=${Atk}, Def=${Def}, SpAtk=${SpAtk}, SpDef=${SpDef}, Speed=${Speed}.\n`+
-      `Nerf used: ${nerf}. CPM: ${CPM}. IVs used: HP ${iv_hp}, Atk ${iv_atk}, Def ${iv_def}.\n`+
+      `Nerf: ${nerf}. CPM: ${CPM}. IVs: HP ${iv_hp}, Atk ${iv_atk}, Def ${iv_def}.\n`+
       `Computed: HP_go=${baseGO.HP_go}, Attack_go=${baseGO.Attack_go}, Defense_go=${baseGO.Defense_go}.\n`+
-      `Final stats (unrounded for CP calc): HP=${finalHP.toFixed(6)}, Attack=${finalAttack.toFixed(6)}, Defense=${finalDefense.toFixed(6)}.\n`+
+      `Final stats: HP=${finalHP.toFixed(6)}, Attack=${finalAttack.toFixed(6)}, Defense=${finalDefense.toFixed(6)}.\n`+
       `CP formula: floor((sqrt(HP) × Attack × sqrt(Defense)) / 10) → ${cpVal}`;
 
     return {finalHP,finalAttack,finalDefense,cpVal,baseGO,CPM,nerf};
