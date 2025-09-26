@@ -13,11 +13,11 @@
         <div class="panel">
           <div class="two">
             <div>
-              <label>HP (core-series base)</label>
+              <label>HP</label>
               <input id="hp" type="number" min="1" value="100">
             </div>
             <div>
-              <label>Speed (core-series base)</label>
+              <label>Speed</label>
               <input id="speed" type="number" min="1" value="100">
             </div>
           </div>
@@ -26,11 +26,11 @@
 
           <div class="two">
             <div>
-              <label>Attack (core-series base)</label>
+              <label>Attack</label>
               <input id="atk" type="number" min="1" value="120">
             </div>
             <div>
-              <label>Sp. Attack (core-series base)</label>
+              <label>Sp. Attack</label>
               <input id="spatk" type="number" min="1" value="100">
             </div>
           </div>
@@ -39,11 +39,11 @@
 
           <div class="two">
             <div>
-              <label>Defense (core-series base)</label>
+              <label>Defense</label>
               <input id="def" type="number" min="1" value="100">
             </div>
             <div>
-              <label>Sp. Defense (core-series base)</label>
+              <label>Sp. Defense</label>
               <input id="spdef" type="number" min="1" value="80">
             </div>
           </div>
@@ -52,14 +52,14 @@
 
           <label>Nerf selection (choose the single most specific applicable)</label>
           <select id="nerfSelect">
-            <option value="1">None / Normal (nerf = 1)</option>
-            <option value="0.91">CP ≥ 4000 at L40 max IVs OR Armored Mewtwo (nerf = 0.91)</option>
-            <option value="0.97">Mega Rayquaza or Primal Groudon or Primal Kyogre (nerf = 0.97)</option>
-            <option value="1_mega">Mega evolved (other) (nerf = 1)</option>
+            <option value="1">None (1)</option>
+            <option value="0.91">CP ≥ 4000 at L40 max IVs (0.91)</option>
+            <option value="0.97">Primal Pokémon (0.97)</option>
+            <option value="1_mega">Mega evolved (1)</option>
           </select>
           <div style="height:10px"></div>
 
-          <label>CPM (Combat Power Multiplier)</label>
+          <label>CPM</label>
           <div class="row" style="margin-bottom:8px">
             <select id="levelSel">
               <option value="40">Level 40 (CPM = 0.7903)</option>
@@ -88,24 +88,7 @@
               <label class="muted">Defense IV</label>
               <input id="iv_def" class="small" type="number" min="0" max="15" value="15">
             </div>
-            <div>
-              <label class="muted">SpAtk IV</label>
-              <input id="iv_spatk" class="small" type="number" min="0" max="15" value="15">
-            </div>
           </div>
-
-          <div style="height:8px"></div>
-          <div class="two">
-            <div>
-              <label class="muted">SpDef IV</label>
-              <input id="iv_spdef" class="small" type="number" min="0" max="15" value="15">
-            </div>
-            <div>
-              <label class="muted">Speed IV</label>
-              <input id="iv_speed" class="small" type="number" min="0" max="15" value="15">
-            </div>
-          </div>
-
           <div style="height:14px"></div>
           <div class="row">
             <button id="calc" class="btn">Calculate</button>
@@ -122,9 +105,9 @@
             <tbody>
               <tr><td>SpeedMult</td><td id="res_speedmult">—</td></tr>
               <tr><td>nerf</td><td id="res_nerf">—</td></tr>
-              <tr><td>Base HP (HP_go)</td><td id="res_hpg">—</td></tr>
-              <tr><td>Base Attack (Attack_go)</td><td id="res_atkg">—</td></tr>
-              <tr><td>Base Defense (Defense_go)</td><td id="res_defg">—</td></tr>
+              <tr><td>Base HP</td><td id="res_hpg">—</td></tr>
+              <tr><td>Base Attack</td><td id="res_atkg">—</td></tr>
+              <tr><td>Base Defense</td><td id="res_defg">—</td></tr>
               <tr><td>Selected CPM</td><td id="res_cpm">—</td></tr>
               <tr><td>Final HP (base+IV)×CPM</td><td id="res_hp_final">—</td></tr>
               <tr><td>Final Attack</td><td id="res_atk_final">—</td></tr>
