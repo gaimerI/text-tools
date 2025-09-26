@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>redirecting...</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://gaimeri.github.io/styles.css">
+  <script>
+    (function () {
+      function getParam(name) {
+        try {
+          return new URLSearchParams(window.location.search).get(name);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      var dest = getParam('url');
+      if (dest) {
+        dest = decodeURIComponent(dest).trim();
+        if (/^https?:\/\//i.test(dest)) {
+          setTimeout(function () {
+            window.location.replace(dest);
+          }, 600);
+          return;
+        } else {
+          document.documentElement.dataset.error = 'invalid-scheme';
+        }
+      } else {
+        document.documentElement.dataset.error = 'missing';
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="box">
+    <h1>Redirecting…</h1>
+    <p id="msg">This... exists. I'm not using it for anything though</p>
+    <p id="fallback" style="display:none;">
+      If my code breaks (no redirection), <a id="link" href="#">click here</a>.
+    </p>
+  </div>
+
+  <script>
+    var err = document.documentElement.dataset.error;
+    var msg = document.getElementById('msg');
+    var fallback = document.getElementById('fallback');
+    var link = document.getElementById('link');
+    if (err === 'missing') {
+      msg.textContent = 'No destination URL provided. Add ?url=https://example.com to the address bar.';
+    } else if (err === 'invalid-scheme') {
+      msg.textContent = 'Destination URL must start with http:// or https://.';
+    } else {
+      var params = new URLSearchParams(window.location.search);
+      var dest = params.get('url');
+      if (dest) {
+        try { dest = decodeURIComponent(dest); } catch(e){}
+        link.href = dest;
+        fallback.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
