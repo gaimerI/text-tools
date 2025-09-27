@@ -10,27 +10,27 @@
   <div class="grid">
     <div class="flex">
       <label style="width: 120px;">HP</label>
-      <input id="hp" type="number" min="1" value="100">
+      <input id="hp" type="number" min="1" value="65">
     </div>
     <div class="flex">
       <label style="width: 120px;">Speed</label>
-      <input id="speed" type="number" min="1" value="100">
+      <input id="speed" type="number" min="1" value="98">
     </div>
     <div class="flex">
       <label style="width: 120px;">Attack</label>
-      <input id="atk" type="number" min="1" value="120">
+      <input id="atk" type="number" min="1" value="63">
     </div>
     <div class="flex">
       <label style="width: 120px;">Sp. Attack</label>
-      <input id="spatk" type="number" min="1" value="100">
+      <input id="spatk" type="number" min="1" value="40">
     </div>
     <div class="flex">
       <label style="width: 120px;">Defense</label>
-      <input id="def" type="number" min="1" value="100">
+      <input id="def" type="number" min="1" value="73">
     </div>
     <div class="flex">
       <label style="width: 120px;">Sp. Defense</label>
-      <input id="spdef" type="number" min="1" value="80">
+      <input id="spdef" type="number" min="1" value="96">
     </div>
   </div>
   
@@ -170,12 +170,6 @@
     getEl('res_def_final').textContent = finalDefense.toFixed(4);
     getEl('res_cp').textContent = cpVal;
 
-    getEl('details').textContent = `Inputs: HP=${HP}, Atk=${Atk}, Def=${Def}, SpAtk=${SpAtk}, SpDef=${SpDef}, Speed=${Speed}.\n`+
-      `Nerf: ${nerf}. CPM: ${CPM}. IVs: HP ${iv_hp}, Atk ${iv_atk}, Def ${iv_def}.\n`+
-      `Computed: HP_go=${baseGO.HP_go}, Attack_go=${baseGO.Attack_go}, Defense_go=${baseGO.Defense_go}.\n`+
-      `Final stats: HP=${finalHP.toFixed(6)}, Attack=${finalAttack.toFixed(6)}, Defense=${finalDefense.toFixed(6)}.\n`+
-      `CP formula: floor((sqrt(HP) × Attack × sqrt(Defense)) / 10) → ${cpVal}`;
-
     return {finalHP,finalAttack,finalDefense,cpVal,baseGO,CPM,nerf};
   }
 
@@ -184,73 +178,21 @@
       const el=getEl(id);
       if(!el) return;
       // reset to default-ish values
-      if(id==='hp') el.value = 100;
-      else if(id==='speed') el.value = 100;
-      else if(id==='atk') el.value = 120;
-      else if(id==='spatk') el.value = 100;
-      else if(id==='def') el.value = 100;
-      else if(id==='spdef') el.value = 80;
+      if(id==='hp') el.value = 65;
+      else if(id==='speed') el.value = 98;
+      else if(id==='atk') el.value = 63;
+      else if(id==='spatk') el.value = 40;
+      else if(id==='def') el.value = 73;
+      else if(id==='spdef') el.value = 96;
       else el.value = 15;
     });
     getEl('nerfSelect').value = '1';
     getEl('levelSel').value = '40';
-    getEl('details').textContent = 'No calculation yet — click Calculate.';
-    ['res_speedmult','res_nerf','res_hpg','res_atkg','res_defg','res_cpm','res_hp_final','res_atk_final','res_def_final','res_cp'].forEach(id=>{
-      const el=getEl(id); if(el) el.textContent='—';
-    });
-    const tbody = getEl('testsTable').querySelector('tbody');
-    if(tbody) tbody.innerHTML = '';
-  }
-
-  // Sample test runner (adds a few example cases to the tests table)
-  function runSampleTests(){
-    const cases = [
-      {name:'Default (example)', inputs:{hp:100,atk:120,def:100,spatk:100,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
-      {name:'High Attack', inputs:{hp:78,atk:130,def:70,spatk:95,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
-      {name:'Mega Rayquaza (nerf 0.97, L50)', inputs:{hp:105,atk:180,def:90,spatk:180,spdef:95,speed:115}, level:50, nerf:'0.97', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}}
-    ];
-
-    const tbody = getEl('testsTable').querySelector('tbody');
-    if(!tbody) return;
-    tbody.innerHTML = '';
-
-    cases.forEach(c => {
-      // fill inputs
-      getEl('hp').value = c.inputs.hp;
-      getEl('atk').value = c.inputs.atk;
-      getEl('def').value = c.inputs.def;
-      getEl('spatk').value = c.inputs.spatk;
-      getEl('spdef').value = c.inputs.spdef;
-      getEl('speed').value = c.inputs.speed;
-      getEl('nerfSelect').value = c.nerf;
-      getEl('levelSel').value = String(c.level);
-      getEl('iv_hp').value = c.ivs.hp;
-      getEl('iv_atk').value = c.ivs.atk;
-      getEl('iv_def').value = c.ivs.def;
-      getEl('iv_spatk').value = c.ivs.spatk;
-      getEl('iv_spdef').value = c.ivs.spdef;
-      getEl('iv_speed').value = c.ivs.speed;
-
-      const res = calculate();
-
-      const tr = document.createElement('tr');
-      const tname = document.createElement('td'); tname.textContent = c.name;
-      const tlevel = document.createElement('td'); tlevel.textContent = c.level;
-      const tnerf = document.createElement('td'); tnerf.textContent = res.nerf;
-      const thp = document.createElement('td'); thp.textContent = res.finalHP.toFixed(4);
-      const tatk = document.createElement('td'); tatk.textContent = res.finalAttack.toFixed(4);
-      const tdef = document.createElement('td'); tdef.textContent = res.finalDefense.toFixed(4);
-      const tcp = document.createElement('td'); tcp.textContent = res.cpVal;
-      tr.appendChild(tname); tr.appendChild(tlevel); tr.appendChild(tnerf); tr.appendChild(thp); tr.appendChild(tatk); tr.appendChild(tdef); tr.appendChild(tcp);
-      tbody.appendChild(tr);
-    });
   }
 
   document.addEventListener('DOMContentLoaded', ()=>{
     getEl('calc').addEventListener('click', ()=>{ calculate(); });
     getEl('reset').addEventListener('click', (e)=>{ e.preventDefault(); resetForm(); });
-    getEl('runTests').addEventListener('click', ()=>{ runSampleTests(); });
-    getEl('fillDefault').addEventListener('click', ()=>{ resetForm(); });
 
     // live calculation on enter
     document.querySelectorAll('input').forEach(i=>i.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); calculate(); }}));
