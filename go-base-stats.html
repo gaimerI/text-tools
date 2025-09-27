@@ -1,313 +1,304 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pokémon GO Base Stat Calculator</title>
-  <link rel="stylesheet" href="https://gaimeri.github.io/styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pokémon GO Base Stat Calculator</title>
+    <link rel="stylesheet" href="https://gaimeri.github.io/styles.css">
 </head>
+
 <body>
-  <div class="app" role="application">
-    <div class="grid">
-      <div>
-        <div class="panel">
-          <div class="two">
-            <div>
-              <label>HP</label>
-              <input id="hp" type="number" min="1" value="100">
-            </div>
-            <div>
-              <label>Speed</label>
-              <input id="speed" type="number" min="1" value="100">
-            </div>
-          </div>
-
-          <div style="height:10px"></div>
-
-          <div class="two">
-            <div>
-              <label>Attack</label>
-              <input id="atk" type="number" min="1" value="120">
-            </div>
-            <div>
-              <label>Sp. Attack</label>
-              <input id="spatk" type="number" min="1" value="100">
-            </div>
-          </div>
-
-          <div style="height:10px"></div>
-
-          <div class="two">
-            <div>
-              <label>Defense</label>
-              <input id="def" type="number" min="1" value="100">
-            </div>
-            <div>
-              <label>Sp. Defense</label>
-              <input id="spdef" type="number" min="1" value="80">
-            </div>
-          </div>
-
-          <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px">
-
-          <label>Nerf</label>
-          <select id="nerfSelect">
+    <div class="flex">
+        <label style="width: 80px;">HP</label>
+        <input id="hp" type="number" min="1" value="100">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Attack</label>
+        <input id="atk" type="number" min="1" value="120">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Defense</label>
+        <input id="def" type="number" min="1" value="100">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Sp. Attack</label>
+        <input id="spatk" type="number" min="1" value="100">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Sp. Defense</label>
+        <input id="spdef" type="number" min="1" value="80">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Speed</label>
+        <input id="speed" type="number" min="1" value="100">
+    </div>
+    <div class="flex">
+        <label style="width: 80px;">Nerf</label>
+        <select id="nerfSelect">
             <option value="1">None (1)</option>
             <option value="0.91">CP ≥ 4000 at L40 max IVs (0.91)</option>
             <option value="0.97">Primal (0.97)</option>
             <option value="1_mega">Mega evolved (1)</option>
           </select>
-          <div style="height:10px"></div>
+    </div>
+    <div class="flex">
 
-          <label>CPM</label>
-          <div class="row" style="margin-bottom:8px">
-            <select id="levelSel">
+        <label style="width: 80px;">CPM</label>
+        <select id="levelSel">
               <option value="40">Level 40 (CPM = 0.7903)</option>
               <option value="50">Level 50 (CPM = 0.8403)</option>
             </select>
-            <div style="flex:1"></div>
-            <div class="muted">FinalStat = (base + IV) × CPM</div>
-          </div>
-
-          <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px">
-
-          <label>IVs (0–15)</label>
-          <div class="two">
-            <div>
-              <label class="muted">HP IV</label>
-              <input id="iv_hp" class="small" type="number" min="0" max="15" value="15">
-            </div>
-            <div>
-              <label class="muted">Attack IV</label>
-              <input id="iv_atk" class="small" type="number" min="0" max="15" value="15">
-            </div>
-          </div>
-          <div style="height:8px"></div>
-          <div class="two">
-            <div>
-              <label class="muted">Defense IV</label>
-              <input id="iv_def" class="small" type="number" min="0" max="15" value="15">
-            </div>
-            <div>
-              <label class="muted">SpAtk IV</label>
-              <input id="iv_spatk" class="small" type="number" min="0" max="15" value="15" style="display: none;">
-            </div>
-          </div>
-
-          <div style="height:8px"></div>
-          <div class="two">
-            <div>
-              <label class="muted">SpDef IV</label>
-              <input id="iv_spdef" class="small" type="number" min="0" max="15" value="15" style="display: none;">
-            </div>
-            <div>
-              <label class="muted">Speed IV</label>
-              <input id="iv_speed" class="small" type="number" min="0" max="15" value="15" style="display: none;">
-            </div>
-          </div>
-
-          <div style="height:14px"></div>
-          <div class="row">
-            <button id="calc" class="btn">Calculate</button>
-            <button id="reset" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Reset</button>
-          </div>
+    </div>
+    <label>IVs (0–15)</label>
+    <div class="flex">
+        <div class="flex">
+            <label style="width: 80px;">HP IV</label>
+            <input id="iv_hp" class="small" type="number" min="0" max="15" value="15">
         </div>
+        <div class="flex">
+            <label style="width: 80px;">Attack IV</label>
+            <input id="iv_atk" class="small" type="number" min="0" max="15" value="15">
+        </div>
+        <div class="flex">
+            <label style="width: 80px;">Defense IV</label>
+            <input id="iv_def" class="small" type="number" min="0" max="15" value="15">
+        </div>
+        <div class="flex">
+            <input id="iv_spatk" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+        </div>
+        <div class="flex">
+            <input id="iv_spdef" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+        </div>
+        <div class="flex">
+            <input id="iv_speed" class="small" type="number" min="0" max="15" value="15" style="display: none;">
+        </div>
+    </div>
+    <div class="flex">
 
-      <div>
-        <div class="panel">
-          <h3 style="margin:0 0 6px">Results</h3>
-          <div class="help">Base GO stats (rounded) and Final stats using IVs & CPM. CP is computed from the Final HP/Attack/Defense values.</div>
+        <button id="calc">Calculate</button>
+        <button id="reset">Reset</button>
+    </div>
 
-          <table class="stat-table" id="resultsTable">
+    <div>
+        <h3 style="margin:0 0 6px">Results</h3>
+
+        <table class="stat-table" id="resultsTable">
             <tbody>
-              <tr><td>SpeedMult</td><td id="res_speedmult">—</td></tr>
-              <tr><td>nerf</td><td id="res_nerf">—</td></tr>
-              <tr><td>Base HP</td><td id="res_hpg">—</td></tr>
-              <tr><td>Base Attack</td><td id="res_atkg">—</td></tr>
-              <tr><td>Base Defense</td><td id="res_defg">—</td></tr>
-              <tr><td>Selected CPM</td><td id="res_cpm">—</td></tr>
-              <tr><td>Final HP</td><td id="res_hp_final">—</td></tr>
-              <tr><td>Final Attack</td><td id="res_atk_final">—</td></tr>
-              <tr><td>Final Defense</td><td id="res_def_final">—</td></tr>
-              <tr><td>CP (floor)</td><td id="res_cp" style="font-weight:700">—</td></tr>
+                <tr>
+                    <td>SpeedMult</td>
+                    <td id="res_speedmult">—</td>
+                </tr>
+                <tr>
+                    <td>nerf</td>
+                    <td id="res_nerf">—</td>
+                </tr>
+                <tr>
+                    <td>Base HP</td>
+                    <td id="res_hpg">—</td>
+                </tr>
+                <tr>
+                    <td>Base Attack</td>
+                    <td id="res_atkg">—</td>
+                </tr>
+                <tr>
+                    <td>Base Defense</td>
+                    <td id="res_defg">—</td>
+                </tr>
+                <tr>
+                    <td>Selected CPM</td>
+                    <td id="res_cpm">—</td>
+                </tr>
+                <tr>
+                    <td>Final HP</td>
+                    <td id="res_hp_final">—</td>
+                </tr>
+                <tr>
+                    <td>Final Attack</td>
+                    <td id="res_atk_final">—</td>
+                </tr>
+                <tr>
+                    <td>Final Defense</td>
+                    <td id="res_def_final">—</td>
+                </tr>
+                <tr>
+                    <td>CP (floor)</td>
+                    <td id="res_cp" style="font-weight:700">—</td>
+                </tr>
             </tbody>
-          </table>
+        </table>
+    </div>
 
-          <div class="output" id="details">No calculation yet — click Calculate.</div>
-        </div>
-        </div>
-      </div>
-        </div>
-      </div>
-
-<script>
-  // Helper functions
-  const getEl = id => document.getElementById(id);
-  function round(v){ return Math.round(v); }
-  function floor(v){ return Math.floor(v); }
-
-  function computeBaseGO(stats){
-    const {HP,Atk,Def,SpAtk,SpDef,Speed,nerf} = stats;
-    const SpeedMult = 1 + (Speed - 75)/500;
-    // HP_go = round((50 + 1.75 × HP) × nerf)
-    const HP_go = round((50 + 1.75 * HP) * nerf);
-
-    // Attack inner: round(1/4 × min(Attack, SpAtk) + 7/4 × max(Attack, SpAtk))
-    const aMin = Math.min(Atk, SpAtk);
-    const aMax = Math.max(Atk, SpAtk);
-    const atkInner = round( (1/4) * aMin + (7/4) * aMax );
-    const Attack_go = round( atkInner * SpeedMult * nerf );
-
-    // Defense inner: round(3/4 × min(Defense, SpDef) + 5/4 × max(Defense, SpDef))
-    const dMin = Math.min(Def, SpDef);
-    const dMax = Math.max(Def, SpDef);
-    const defInner = round( (3/4) * dMin + (5/4) * dMax );
-    const Defense_go = round( defInner * SpeedMult * nerf );
-
-    return {HP_go,Attack_go,Defense_go,SpeedMult,atkInner,defInner};
-  }
-
-  function getCPM(level){
-    if (String(level) === '40') return 0.7903;
-    if (String(level) === '50') return 0.8403;
-    return 0.7903;
-  }
-
-  function calculate(){
-    const HP = Number(getEl('hp').value) || 0;
-    const Speed = Number(getEl('speed').value) || 0;
-    const Atk = Number(getEl('atk').value) || 0;
-    const SpAtk = Number(getEl('spatk').value) || 0;
-    const Def = Number(getEl('def').value) || 0;
-    const SpDef = Number(getEl('spdef').value) || 0;
-
-    const nerfVal = getEl('nerfSelect').value;
-    let nerf = 1;
-    if(nerfVal === '0.91') nerf = 0.91;
-    else if(nerfVal === '0.97') nerf = 0.97;
-    else nerf = 1;
-
-    const level = Number(getEl('levelSel').value);
-    const CPM = getCPM(level);
-
-    const iv_hp = Number(getEl('iv_hp').value) || 0;
-    const iv_atk = Number(getEl('iv_atk').value) || 0;
-    const iv_def = Number(getEl('iv_def').value) || 0;
-    const iv_spatk = Number(getEl('iv_spatk').value) || 0;
-    const iv_spdef = Number(getEl('iv_spdef').value) || 0;
-    const iv_speed = Number(getEl('iv_speed').value) || 0;
-
-    const base = {HP,Atk,Def,SpAtk,SpDef,Speed,nerf};
-    const baseGO = computeBaseGO(base);
-
-    // FinalStat = (base + IV) × CPM
-    const finalHP = (baseGO.HP_go + iv_hp) * CPM;
-    const finalAttack = (baseGO.Attack_go + iv_atk) * CPM;
-    const finalDefense = (baseGO.Defense_go + iv_def) * CPM;
-
-    // CP = floor((sqrt(HP)×Attack×sqrt(Defense))/10)
-    const cpVal = floor( (Math.sqrt(finalHP) * finalAttack * Math.sqrt(finalDefense)) / 10 );
-
-    // Update UI
-    getEl('res_speedmult').textContent = baseGO.SpeedMult.toFixed(5);
-    getEl('res_nerf').textContent = nerf;
-    getEl('res_hpg').textContent = baseGO.HP_go;
-    getEl('res_atkg').textContent = baseGO.Attack_go + ` (inner ${baseGO.atkInner})`;
-    getEl('res_defg').textContent = baseGO.Defense_go + ` (inner ${baseGO.defInner})`;
-    getEl('res_cpm').textContent = CPM;
-    getEl('res_hp_final').textContent = finalHP.toFixed(4);
-    getEl('res_atk_final').textContent = finalAttack.toFixed(4);
-    getEl('res_def_final').textContent = finalDefense.toFixed(4);
-    getEl('res_cp').textContent = cpVal;
-
-    getEl('details').textContent = `Inputs: HP=${HP}, Atk=${Atk}, Def=${Def}, SpAtk=${SpAtk}, SpDef=${SpDef}, Speed=${Speed}.\n`+
-      `Nerf: ${nerf}. CPM: ${CPM}. IVs: HP ${iv_hp}, Atk ${iv_atk}, Def ${iv_def}.\n`+
-      `Computed: HP_go=${baseGO.HP_go}, Attack_go=${baseGO.Attack_go}, Defense_go=${baseGO.Defense_go}.\n`+
-      `Final stats: HP=${finalHP.toFixed(6)}, Attack=${finalAttack.toFixed(6)}, Defense=${finalDefense.toFixed(6)}.\n`+
-      `CP formula: floor((sqrt(HP) × Attack × sqrt(Defense)) / 10) → ${cpVal}`;
-
-    return {finalHP,finalAttack,finalDefense,cpVal,baseGO,CPM,nerf};
-  }
-
-  function resetForm(){
-    [ 'hp','speed','atk','spatk','def','spdef','iv_hp','iv_atk','iv_def','iv_spatk','iv_spdef','iv_speed' ].forEach(id=>{
-      const el=getEl(id);
-      if(!el) return;
-      // reset to default-ish values
-      if(id==='hp') el.value = 100;
-      else if(id==='speed') el.value = 100;
-      else if(id==='atk') el.value = 120;
-      else if(id==='spatk') el.value = 100;
-      else if(id==='def') el.value = 100;
-      else if(id==='spdef') el.value = 80;
-      else el.value = 15;
-    });
-    getEl('nerfSelect').value = '1';
-    getEl('levelSel').value = '40';
-    getEl('details').textContent = 'No calculation yet — click Calculate.';
-    ['res_speedmult','res_nerf','res_hpg','res_atkg','res_defg','res_cpm','res_hp_final','res_atk_final','res_def_final','res_cp'].forEach(id=>{
-      const el=getEl(id); if(el) el.textContent='—';
-    });
-    const tbody = getEl('testsTable').querySelector('tbody');
-    if(tbody) tbody.innerHTML = '';
-  }
-
-  // Sample test runner (adds a few example cases to the tests table)
-  function runSampleTests(){
-    const cases = [
-      {name:'Default (example)', inputs:{hp:100,atk:120,def:100,spatk:100,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
-      {name:'High Attack', inputs:{hp:78,atk:130,def:70,spatk:95,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
-      {name:'Mega Rayquaza (nerf 0.97, L50)', inputs:{hp:105,atk:180,def:90,spatk:180,spdef:95,speed:115}, level:50, nerf:'0.97', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}}
-    ];
-
-    const tbody = getEl('testsTable').querySelector('tbody');
-    if(!tbody) return;
-    tbody.innerHTML = '';
-
-    cases.forEach(c => {
-      // fill inputs
-      getEl('hp').value = c.inputs.hp;
-      getEl('atk').value = c.inputs.atk;
-      getEl('def').value = c.inputs.def;
-      getEl('spatk').value = c.inputs.spatk;
-      getEl('spdef').value = c.inputs.spdef;
-      getEl('speed').value = c.inputs.speed;
-      getEl('nerfSelect').value = c.nerf;
-      getEl('levelSel').value = String(c.level);
-      getEl('iv_hp').value = c.ivs.hp;
-      getEl('iv_atk').value = c.ivs.atk;
-      getEl('iv_def').value = c.ivs.def;
-      getEl('iv_spatk').value = c.ivs.spatk;
-      getEl('iv_spdef').value = c.ivs.spdef;
-      getEl('iv_speed').value = c.ivs.speed;
-
-      const res = calculate();
-
-      const tr = document.createElement('tr');
-      const tname = document.createElement('td'); tname.textContent = c.name;
-      const tlevel = document.createElement('td'); tlevel.textContent = c.level;
-      const tnerf = document.createElement('td'); tnerf.textContent = res.nerf;
-      const thp = document.createElement('td'); thp.textContent = res.finalHP.toFixed(4);
-      const tatk = document.createElement('td'); tatk.textContent = res.finalAttack.toFixed(4);
-      const tdef = document.createElement('td'); tdef.textContent = res.finalDefense.toFixed(4);
-      const tcp = document.createElement('td'); tcp.textContent = res.cpVal;
-      tr.appendChild(tname); tr.appendChild(tlevel); tr.appendChild(tnerf); tr.appendChild(thp); tr.appendChild(tatk); tr.appendChild(tdef); tr.appendChild(tcp);
-      tbody.appendChild(tr);
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    getEl('calc').addEventListener('click', ()=>{ calculate(); });
-    getEl('reset').addEventListener('click', (e)=>{ e.preventDefault(); resetForm(); });
-    getEl('runTests').addEventListener('click', ()=>{ runSampleTests(); });
-    getEl('fillDefault').addEventListener('click', ()=>{ resetForm(); });
-
-    // live calculation on enter
-    document.querySelectorAll('input').forEach(i=>i.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); calculate(); }}));
-
-    // initialize
-    resetForm();
-  });
-</script>
+    <div class="output" style="display: none" id="details">No calculation yet — click Calculate.</div>
+    <script>
+        // Helper functions
+          const getEl = id => document.getElementById(id);
+          function round(v){ return Math.round(v); }
+          function floor(v){ return Math.floor(v); }
+        
+          function computeBaseGO(stats){
+            const {HP,Atk,Def,SpAtk,SpDef,Speed,nerf} = stats;
+            const SpeedMult = 1 + (Speed - 75)/500;
+            // HP_go = round((50 + 1.75 × HP) × nerf)
+            const HP_go = round((50 + 1.75 * HP) * nerf);
+        
+            // Attack inner: round(1/4 × min(Attack, SpAtk) + 7/4 × max(Attack, SpAtk))
+            const aMin = Math.min(Atk, SpAtk);
+            const aMax = Math.max(Atk, SpAtk);
+            const atkInner = round( (1/4) * aMin + (7/4) * aMax );
+            const Attack_go = round( atkInner * SpeedMult * nerf );
+        
+            // Defense inner: round(3/4 × min(Defense, SpDef) + 5/4 × max(Defense, SpDef))
+            const dMin = Math.min(Def, SpDef);
+            const dMax = Math.max(Def, SpDef);
+            const defInner = round( (3/4) * dMin + (5/4) * dMax );
+            const Defense_go = round( defInner * SpeedMult * nerf );
+        
+            return {HP_go,Attack_go,Defense_go,SpeedMult,atkInner,defInner};
+          }
+        
+          function getCPM(level){
+            if (String(level) === '40') return 0.7903;
+            if (String(level) === '50') return 0.8403;
+            return 0.7903;
+          }
+        
+          function calculate(){
+            const HP = Number(getEl('hp').value) || 0;
+            const Speed = Number(getEl('speed').value) || 0;
+            const Atk = Number(getEl('atk').value) || 0;
+            const SpAtk = Number(getEl('spatk').value) || 0;
+            const Def = Number(getEl('def').value) || 0;
+            const SpDef = Number(getEl('spdef').value) || 0;
+        
+            const nerfVal = getEl('nerfSelect').value;
+            let nerf = 1;
+            if(nerfVal === '0.91') nerf = 0.91;
+            else if(nerfVal === '0.97') nerf = 0.97;
+            else nerf = 1;
+        
+            const level = Number(getEl('levelSel').value);
+            const CPM = getCPM(level);
+        
+            const iv_hp = Number(getEl('iv_hp').value) || 0;
+            const iv_atk = Number(getEl('iv_atk').value) || 0;
+            const iv_def = Number(getEl('iv_def').value) || 0;
+            const iv_spatk = Number(getEl('iv_spatk').value) || 0;
+            const iv_spdef = Number(getEl('iv_spdef').value) || 0;
+            const iv_speed = Number(getEl('iv_speed').value) || 0;
+        
+            const base = {HP,Atk,Def,SpAtk,SpDef,Speed,nerf};
+            const baseGO = computeBaseGO(base);
+        
+            // FinalStat = (base + IV) × CPM
+            const finalHP = (baseGO.HP_go + iv_hp) * CPM;
+            const finalAttack = (baseGO.Attack_go + iv_atk) * CPM;
+            const finalDefense = (baseGO.Defense_go + iv_def) * CPM;
+        
+            // CP = floor((sqrt(HP)×Attack×sqrt(Defense))/10)
+            const cpVal = floor( (Math.sqrt(finalHP) * finalAttack * Math.sqrt(finalDefense)) / 10 );
+        
+            // Update UI
+            getEl('res_speedmult').textContent = baseGO.SpeedMult.toFixed(5);
+            getEl('res_nerf').textContent = nerf;
+            getEl('res_hpg').textContent = baseGO.HP_go;
+            getEl('res_atkg').textContent = baseGO.Attack_go + ` (inner ${baseGO.atkInner})`;
+            getEl('res_defg').textContent = baseGO.Defense_go + ` (inner ${baseGO.defInner})`;
+            getEl('res_cpm').textContent = CPM;
+            getEl('res_hp_final').textContent = finalHP.toFixed(4);
+            getEl('res_atk_final').textContent = finalAttack.toFixed(4);
+            getEl('res_def_final').textContent = finalDefense.toFixed(4);
+            getEl('res_cp').textContent = cpVal;
+        
+            getEl('details').textContent = `Inputs: HP=${HP}, Atk=${Atk}, Def=${Def}, SpAtk=${SpAtk}, SpDef=${SpDef}, Speed=${Speed}.\n`+
+              `Nerf: ${nerf}. CPM: ${CPM}. IVs: HP ${iv_hp}, Atk ${iv_atk}, Def ${iv_def}.\n`+
+              `Computed: HP_go=${baseGO.HP_go}, Attack_go=${baseGO.Attack_go}, Defense_go=${baseGO.Defense_go}.\n`+
+              `Final stats: HP=${finalHP.toFixed(6)}, Attack=${finalAttack.toFixed(6)}, Defense=${finalDefense.toFixed(6)}.\n`+
+              `CP formula: floor((sqrt(HP) × Attack × sqrt(Defense)) / 10) → ${cpVal}`;
+        
+            return {finalHP,finalAttack,finalDefense,cpVal,baseGO,CPM,nerf};
+          }
+        
+          function resetForm(){
+            [ 'hp','speed','atk','spatk','def','spdef','iv_hp','iv_atk','iv_def','iv_spatk','iv_spdef','iv_speed' ].forEach(id=>{
+              const el=getEl(id);
+              if(!el) return;
+              // reset to default-ish values
+              if(id==='hp') el.value = 100;
+              else if(id==='speed') el.value = 100;
+              else if(id==='atk') el.value = 120;
+              else if(id==='spatk') el.value = 100;
+              else if(id==='def') el.value = 100;
+              else if(id==='spdef') el.value = 80;
+              else el.value = 15;
+            });
+            getEl('nerfSelect').value = '1';
+            getEl('levelSel').value = '40';
+            getEl('details').textContent = 'No calculation yet — click Calculate.';
+            ['res_speedmult','res_nerf','res_hpg','res_atkg','res_defg','res_cpm','res_hp_final','res_atk_final','res_def_final','res_cp'].forEach(id=>{
+              const el=getEl(id); if(el) el.textContent='—';
+            });
+            const tbody = getEl('testsTable').querySelector('tbody');
+            if(tbody) tbody.innerHTML = '';
+          }
+        
+          // Sample test runner (adds a few example cases to the tests table)
+          function runSampleTests(){
+            const cases = [
+              {name:'Default (example)', inputs:{hp:100,atk:120,def:100,spatk:100,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
+              {name:'High Attack', inputs:{hp:78,atk:130,def:70,spatk:95,spdef:80,speed:100}, level:40, nerf:'1', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}},
+              {name:'Mega Rayquaza (nerf 0.97, L50)', inputs:{hp:105,atk:180,def:90,spatk:180,spdef:95,speed:115}, level:50, nerf:'0.97', ivs:{hp:15,atk:15,def:15,spatk:15,spdef:15,speed:15}}
+            ];
+        
+            const tbody = getEl('testsTable').querySelector('tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+        
+            cases.forEach(c => {
+              // fill inputs
+              getEl('hp').value = c.inputs.hp;
+              getEl('atk').value = c.inputs.atk;
+              getEl('def').value = c.inputs.def;
+              getEl('spatk').value = c.inputs.spatk;
+              getEl('spdef').value = c.inputs.spdef;
+              getEl('speed').value = c.inputs.speed;
+              getEl('nerfSelect').value = c.nerf;
+              getEl('levelSel').value = String(c.level);
+              getEl('iv_hp').value = c.ivs.hp;
+              getEl('iv_atk').value = c.ivs.atk;
+              getEl('iv_def').value = c.ivs.def;
+              getEl('iv_spatk').value = c.ivs.spatk;
+              getEl('iv_spdef').value = c.ivs.spdef;
+              getEl('iv_speed').value = c.ivs.speed;
+        
+              const res = calculate();
+        
+              const tr = document.createElement('tr');
+              const tname = document.createElement('td'); tname.textContent = c.name;
+              const tlevel = document.createElement('td'); tlevel.textContent = c.level;
+              const tnerf = document.createElement('td'); tnerf.textContent = res.nerf;
+              const thp = document.createElement('td'); thp.textContent = res.finalHP.toFixed(4);
+              const tatk = document.createElement('td'); tatk.textContent = res.finalAttack.toFixed(4);
+              const tdef = document.createElement('td'); tdef.textContent = res.finalDefense.toFixed(4);
+              const tcp = document.createElement('td'); tcp.textContent = res.cpVal;
+              tr.appendChild(tname); tr.appendChild(tlevel); tr.appendChild(tnerf); tr.appendChild(thp); tr.appendChild(tatk); tr.appendChild(tdef); tr.appendChild(tcp);
+              tbody.appendChild(tr);
+            });
+          }
+        
+          document.addEventListener('DOMContentLoaded', ()=>{
+            getEl('calc').addEventListener('click', ()=>{ calculate(); });
+            getEl('reset').addEventListener('click', (e)=>{ e.preventDefault(); resetForm(); });
+            getEl('runTests').addEventListener('click', ()=>{ runSampleTests(); });
+            getEl('fillDefault').addEventListener('click', ()=>{ resetForm(); });
+        
+            // live calculation on enter
+            document.querySelectorAll('input').forEach(i=>i.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); calculate(); }}));
+        
+            // initialize
+            resetForm();
+          });
+    </script>
 </body>
+
 </html>
