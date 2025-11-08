@@ -1,0 +1,107 @@
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" href="https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css" />
+    <link rel="stylesheet" href="https://gaimeri.github.io/styles.css">
+    
+    <script src="https://fred-wang.github.io/TeXZilla/examples/TeXZilla-show-source.js"></script>
+    <script src="https://fred-wang.github.io/TeXZilla/TeXZilla-min.js"></script>
+    <script src="https://fred-wang.github.io/TeXZilla/examples/customElement.js"></script>
+  </head>
+  <body>
+    <p style="height: 100px">
+      <la-tex id="result" display="block"></la-tex>
+    </p>
+    <textarea id="input" wrap="off"autofocus="true" style="width: 50%; resize: vertical;">\sum_{i=0}^{10} x^{2}</textarea>
+    <script>
+      const input = document.getElementById('input');
+      const output = document.getElementById('result');
+      handleInput();
+      
+      input.addEventListener('input', handleInput);
+      input.addEventListener('keydown', handleShortcuts);
+      
+      function handleInput() {
+        output.textContent = input.value;
+      }
+      
+      function insertText(text, cursorOffset = 0) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        input.value = input.value.slice(0, start) + text + input.value.slice(end);
+        input.focus();
+      
+        // place cursor intelligently
+        const newPos = start + text.length + cursorOffset;
+        input.selectionStart = input.selectionEnd = newPos;
+        handleInput();
+      }
+      
+      function handleShortcuts(e) {
+        // Ctrl+E → exponent
+        if (e.ctrlKey && e.key === 'e') {
+          e.preventDefault();
+          insertText('^{}', -1);
+        }
+      
+        // Ctrl+I → subscript
+        if (e.ctrlKey && !e.altKey && e.key === 'i') {
+          e.preventDefault();
+          insertText('_{}', -1);
+        }
+        
+        if (e.ctrlKey && e.altKey && e.key === 'i') {
+          e.preventDefault();
+          insertText('\\int_a^b', -9);
+        }
+      
+        // Ctrl+L → lambda (example Greek shortcut)
+        if (e.ctrlKey && e.key === 'l') {
+          e.preventDefault();
+          insertText('\\lambda');
+        }
+        
+        if (e.ctrlKey && e.altKey && e.key === 'n') {
+          e.preventDefault();
+          insertText('\\infty');
+        }
+        
+        if (e.ctrlKey && !e.altKey && e.key === 'b') {
+          e.preventDefault();
+          insertText('\\mathbb{R}');
+        }
+        
+        if (e.ctrlKey && e.key === 'm') {
+          e.preventDefault();
+          insertText('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', -29);
+        }
+        
+        if (e.ctrlKey && !e.altKey && e.key === 's' && !e.shiftKey) {
+          e.preventDefault();
+          insertText('\\sum_{i=0}^{n}', -5);
+        }
+        
+        if (e.ctrlKey && e.key === 'r') {
+          e.preventDefault();
+          insertText('\\sqrt{}', -1);
+        }
+        
+        if (e.ctrlKey && e.key === 'f') {
+          e.preventDefault();
+          insertText('\\frac{}{}', -3);
+        }
+        
+        if (e.ctrlKey && e.key === 'p') {
+          e.preventDefault();
+          insertText('\\pi');
+        }
+      }
+    </script>
+  </body>
+</html>
