@@ -173,7 +173,11 @@ const objectFieldSchema = {
     ]
   },
 
-  File: { type: "text" },
+  File: {
+    type: "select",
+    options: ["Map","Sound","Design"]
+    
+  },
 
   Games: {
     type: "select",
@@ -197,6 +201,36 @@ const objectFieldSchema = {
   IsLeftover: { type: "checkbox" }
 };
 
+const objectFilters = {
+  class: "",
+  game: "",
+  category: "",
+  unused: false,
+  leftover: false,
+  search: "",
+  progress: "",
+  file: ""
+};
+
+function getObjectsForClass(classInternalName) {
+  if (!db || !db.Objects) return [];
+
+  return db.Objects.filter(o =>
+    o.ClassNameSMG1 === classInternalName ||
+    o.ClassNameSMG2 === classInternalName
+  ).map(o => ({
+    v: o.InternalName,
+    t: o.Name ? `${o.Name} (${o.InternalName})` : o.InternalName
+  }));
+}
+
+function debounce(fn, wait = 300) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), wait);
+  };
+}
 
 fileInput.onchange = e => {
     const r = new FileReader();
@@ -227,9 +261,26 @@ function switchTab(m) {
     editor.innerHTML = "";
 }
 
+/*
 function renderList() {
     list.innerHTML = "";
-    const arr = mode === "objects" ? db.Objects : db.Classes;
+    
+}
+*/
+
+function renderList() {
+  list.innerHTML = "";
+
+  if (mode === "objects") {
+    renderObjectFilters();
+    renderFilteredObjects();
+  } else {
+    renderClasses();
+  }
+}
+
+function renderClasses() {
+  const arr = db.Classes;
     arr.forEach((e, i) => {
         const d = document.createElement("div");
         d.textContent = e.Name || e.InternalName;
@@ -237,6 +288,174 @@ function renderList() {
         if (i === selectedIndex) d.classList.add("active");
         list.appendChild(d);
     });
+}
+
+function renderObjectFilters() {
+  const filterDiv = document.createElement("div");
+  filterDiv.style.padding = "8px";
+  filterDiv.style.borderBottom = "1px solid #333";
+
+  filterDiv.innerHTML = `
+<label>Class
+  <select id="filterClass">
+    <option value="">All</option>
+    ${getClassOptions().map(c =>
+      `<option value="${c.v}">${c.t}</option>`
+    ).join("")}
+  </select>
+</label>
+
+<label>Game
+  <select id="filterGame">
+    <option value="">All</option>
+    <option value="1">SMG1</option>
+    <option value="2">SMG2</option>
+    <option value="3">Both</option>
+  </select>
+</label>
+
+<label>Category
+  <select id="filterCategory">
+    <option value="">All</option>
+    ${objectFieldSchema.Category.options.map(c =>
+      `<option value="${c}">${c}</option>`
+    ).join("")}
+  </select>
+</label>
+
+<label>Progress
+  <select id="filterProgress">
+    <option value="">All</option>
+    <option value="0">Not understood</option>
+    <option value="1">Partially understood</option>
+    <option value="2">Fully understood</option>
+  </select>
+</label>
+
+<label>File
+  <select id="filterFile">
+    <option value="">All</option>
+    <option value="Map">Map</option>
+    <option value="Sound">Sound</option>
+    <option value="Design">Design</option>
+  </select>
+</label>
+
+<label>
+  <input type="checkbox" id="filterUnused"> Unused
+</label>
+
+<label>
+  <input type="checkbox" id="filterLeftover"> Leftover
+</label>
+
+<label>Search
+  <input id="filterSearch" placeholder="Name or internal name">
+</label>
+`;
+
+  list.appendChild(filterDiv);
+
+  // Restore state
+  filterClass.value = objectFilters.class;
+  filterGame.value = objectFilters.game;
+  filterCategory.value = objectFilters.category;
+  filterProgress.value = objectFilters.progress;
+  filterUnused.checked = objectFilters.unused;
+  filterFile.value = objectFilters.file;
+  filterLeftover.checked = objectFilters.leftover;
+  filterSearch.value = objectFilters.search;
+
+  // Event bindings
+  filterClass.onchange = e => {
+    objectFilters.class = e.target.value;
+    renderList();
+  };
+  filterGame.onchange = e => {
+    objectFilters.game = e.target.value;
+    renderList();
+  };
+  filterCategory.onchange = e => {
+    objectFilters.category = e.target.value;
+    renderList();
+  };
+  filterProgress.onchange = e => {
+    objectFilters.progress = e.target.value;
+    renderList();
+  };
+  filterFile.onchange = e => {
+    objectFilters.file = e.target.value;
+    renderList();
+  };
+  filterUnused.onchange = e => {
+    objectFilters.unused = e.target.checked;
+    renderList();
+  };
+  filterLeftover.onchange = e => {
+    objectFilters.leftover = e.target.checked;
+    renderList();
+  };
+  const debouncedRender = debounce(renderList, 2000);
+  filterSearch.addEventListener('input', e => {
+    objectFilters.search = e.target.value.trim().toLowerCase();
+    debouncedRender();
+  });
+}
+
+function renderFilteredObjects() {
+  const filtered = db.Objects.filter(o => {
+    // Class filter
+    if (objectFilters.class &&
+        o.ClassNameSMG1 !== objectFilters.class &&
+        o.ClassNameSMG2 !== objectFilters.class)
+      return false;
+
+    // Game filter
+    if (objectFilters.game &&
+        String(o.Games) !== objectFilters.game)
+      return false;
+
+    // Category filter
+    if (objectFilters.category &&
+        o.Category !== objectFilters.category)
+      return false;
+    
+    // Progress filter
+    if (objectFilters.progress &&
+        o.Progress !== Number(objectFilters.progress))
+      return false;
+    
+    // File filter
+    if (objectFilters.file &&
+        o.File !== objectFilters.file)
+      return false;
+
+    // Unused filter
+    if (objectFilters.unused && !o.IsUnused)
+      return false;
+
+    // Leftover filter
+    if (objectFilters.leftover && !o.IsLeftover)
+      return false;
+
+    // Text search
+    if (objectFilters.search) {
+      const hay = `${o.Name || ""} ${o.InternalName || ""}`.toLowerCase();
+      if (!hay.includes(objectFilters.search))
+        return false;
+    }
+
+    return true;
+  });
+
+  filtered.forEach(o => {
+    const idx = db.Objects.indexOf(o);
+    const d = document.createElement("div");
+    d.textContent = o.Name || o.InternalName;
+    if (idx === selectedIndex) d.classList.add("active");
+    d.onclick = () => loadEntry(idx);
+    list.appendChild(d);
+  });
 }
 
 function loadEntry(i) {
@@ -453,7 +672,10 @@ function editParameter(name) {
 
     paramEditor.innerHTML = `
 <fieldset>
-<legend>Parameter: ${name}</legend>
+<legend>
+Parameter: ${name}
+${p.Exclusives?.length ? " ⚠ limited" : ""}
+</legend>
 
 <label>Readable Name
 <input id="pName" value="${p.Name || ""}">
@@ -481,11 +703,19 @@ function editParameter(name) {
 
 <button onclick="saveParameter()">Save Parameter</button>
 <button class="danger" onclick="deleteParameter()">Delete Parameter</button>
+
+<h4>Exclusives (only these objects use this parameter)</h4>
+<div id="exclusiveHint" style="font-size:0.85em;color:#aaa;">
+  If empty, all objects of this class use the parameter.
+</div>
+<select id="pExclusives" multiple size="6"></select>
+
 </fieldset>
 `;
 
     pGames.value = p.Games;
     renderValues();
+    renderExclusives();
 }
 
 function renderValues() {
@@ -501,6 +731,24 @@ function renderValues() {
     });
 }
 
+function renderExclusives() {
+  const c = db.Classes[selectedIndex];
+  const p = c.Parameters[selectedParam];
+  const sel = document.getElementById("pExclusives");
+
+  sel.innerHTML = "";
+
+  const options = getObjectsForClass(c.InternalName);
+
+  options.forEach(o => {
+    const opt = document.createElement("option");
+    opt.value = o.v;
+    opt.textContent = o.t;
+    if (p.Exclusives?.includes(o.v)) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
 function addValue() {
     db.Classes[selectedIndex].Parameters[selectedParam].Values.push({ Value: "", Notes: "" });
     renderValues();
@@ -512,18 +760,32 @@ function removeValue(i) {
 }
 
 function saveParameter() {
-    const p = db.Classes[selectedIndex].Parameters[selectedParam];
-    p.Name = pName.value;
-    p.Games = Number(pGames.value);
-    p.Needed = pNeeded.checked;
-    p.Description = pDesc.value;
+  const c = db.Classes[selectedIndex];
+  const p = c.Parameters[selectedParam];
 
-    const rows = values.querySelectorAll(".valueRow");
-    p.Values = [...rows].map(r => ({
-        Value: r.children[0].value,
-        Notes: r.children[1].value
-    }));
+  p.Name = pName.value;
+  p.Games = Number(pGames.value);
+  p.Needed = pNeeded.checked;
+  p.Description = pDesc.value;
+
+  // Values
+  const rows = values.querySelectorAll(".valueRow");
+  p.Values = [...rows].map(r => ({
+    Value: r.children[0].value,
+    Notes: r.children[1].value
+  }));
+
+  // Exclusives
+  const sel = document.getElementById("pExclusives");
+  const selected = [...sel.selectedOptions].map(o => o.value);
+
+  if (selected.length > 0) {
+    p.Exclusives = selected;
+  } else {
+    delete p.Exclusives;
+  }
 }
+
 
 function deleteParameter() {
     if (!confirm("Delete parameter?")) return;
@@ -538,7 +800,7 @@ function downloadJSON() {
     const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "smg_object_database.json";
+    a.download = "objectdb.json";
     a.click();
 }
 </script>
