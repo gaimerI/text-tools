@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMG Object Database Editor</title>
+<style>
+body {
+    font-family: sans-serif;
+    background: #1e1e1e;
+    color: #ddd;
+    margin: 0;
+}
+header {
+    background: #2c2c2c;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+main {
+    display: flex;
+    height: calc(100vh - 50px);
+}
+#sidebar {
+    width: 30%;
+    background: #252525;
+    display: flex;
+    flex-direction: column;
+}
+#tabs, #adds {
+    display: flex;
+}
+#tabs button {
+    flex: 1;
+    background: #333;
+    border: none;
+    color: white;
+    padding: 8px;
+}
+#tabs button.active {
+    background: #3a6ea5;
+}
+#list {
+    flex: 1;
+    overflow-y: auto;
+}
+#list div {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+#list div:hover {
+    background: #333;
+}
+#list .active {
+    background: #3a6ea5;
+}
+#editor {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+label {
+    display: block;
+    margin-top: 8px;
+}
+input, select, textarea {
+    width: 100%;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 4px;
+}
+fieldset {
+    border: 1px solid #444;
+    margin-top: 12px;
+}
+legend {
+    color: #aaa;
+}
+button {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: none;
+    color: white;
+    background: #3a6ea5;
+}
+button.danger {
+    background: #a53a3a;
+}
+.valueRow {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+}
+.valueRow input {
+    flex: 1;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <input type="file" id="fileInput" accept=".json">
+    <button onclick="downloadJSON()">Download JSON</button>
+</header>
+
+<main>
+<div id="sidebar">
+    <div id="tabs">
+        <button id="objectsTab" class="active" onclick="switchTab('objects')">Objects</button>
+        <button id="classesTab" onclick="switchTab('classes')">Classes</button>
+    </div>
+    <div id="adds">
+      <button id="addObject" onclick="addObject()">Add Object</button>
+      <button id="addClass" onclick="addClass()">Add Class</button>
+    </div>
+    <div id="list"></div>
+</div>
+
+<div id="editor"></div>
+</main>
+
+<script>
+let db = null;
+let mode = "objects";
+let selectedIndex = null;
+let selectedParam = null;
+
+const objectFieldSchema = {
+  InternalName: { type: "text" },
+  ClassNameSMG1: {
+    type: "select",
+    dynamicOptions: "classes"
+  },
+  ClassNameSMG2: {
+    type: "select",
+    dynamicOptions: "classes"
+  },
+  Name: { type: "text" },
+  Notes: { type: "textarea" },
+
+  Category: {
+    type: "select",
+    options: [
+      "stagepart","levelfeature","background","enemy","boss","npc",
+      "item","particle","areas","gravity","cutscene","controller","deprecated"
+    ]
+  },
+
+  AreaShape: {
+    type: "select",
+    options: [
+      "Any","Sphere","BaseOriginCube","Cylinder",
+      "CenterOriginCube","Bowl"
+    ]
+  },
+
+  ListSMG1: {
+    type: "select",
+    options: [
+      "MapPartsInfo","ObjInfo","AreaObjInfo","CameraCubeInfo",
+      "ChildObjInfo","DemoObjInfo","PlanetObjInfo",
+      "StartInfo","SoundInfo",""
+    ]
+  },
+
+  ListSMG2: {
+    type: "select",
+    options: [
+      "MapPartsInfo","ObjInfo","AreaObjInfo","CameraCubeInfo",
+      "ChildObjInfo","DemoObjInfo","PlanetObjInfo",
+      "StartInfo","SoundInfo",""
+    ]
+  },
+
+  File: { type: "text" },
+
+  Games: {
+    type: "select",
+    options: [
+      { v: 1, t: "SMG1" },
+      { v: 2, t: "SMG2" },
+      { v: 3, t: "Both" }
+    ]
+  },
+
+  Progress: {
+    type: "select",
+    options: [
+      { v: 0, t: "Not understood" },
+      { v: 1, t: "Partially understood" },
+      { v: 2, t: "Fully understood" }
+    ]
+  },
+
+  IsUnused: { type: "checkbox" },
+  IsLeftover: { type: "checkbox" }
+};
+
+
+fileInput.onchange = e => {
+    const r = new FileReader();
+    r.onload = () => {
+        db = JSON.parse(r.result);
+        renderList();
+    };
+    r.readAsText(e.target.files[0]);
+};
+
+function getClassOptions() {
+  if (!db || !db.Classes) return [];
+
+  return db.Classes.map(c => ({
+    v: c.InternalName,
+    t: c.Name ? `${c.Name} (${c.InternalName})` : c.InternalName
+  }));
+}
+
+
+function switchTab(m) {
+    mode = m;
+    selectedIndex = null;
+    selectedParam = null;
+    objectsTab.classList.toggle("active", m === "objects");
+    classesTab.classList.toggle("active", m === "classes");
+    renderList();
+    editor.innerHTML = "";
+}
+
+function renderList() {
+    list.innerHTML = "";
+    const arr = mode === "objects" ? db.Objects : db.Classes;
+    arr.forEach((e, i) => {
+        const d = document.createElement("div");
+        d.textContent = e.Name || e.InternalName;
+        d.onclick = () => loadEntry(i);
+        if (i === selectedIndex) d.classList.add("active");
+        list.appendChild(d);
+    });
+}
+
+function loadEntry(i) {
+    selectedIndex = i;
+    selectedParam = null;
+    renderList();
+    editor.innerHTML = "";
+    mode === "objects" ? editObject() : editClass();
+}
+
+/* ================= OBJECT EDITOR ================= */
+
+function addObject() {
+  const obj = {
+    InternalName: "NewObject",
+    Name: "New Object",
+    Games: 3,
+    Progress: 0,
+    IsUnused: false,
+    IsLeftover: false
+  };
+  db.Objects.push(obj);
+  renderList();
+}
+
+function deleteObject() {
+  if (selectedIndex === null) return;
+  if (!confirm("Delete this object?")) return;
+  db.Objects.splice(selectedIndex, 1);
+  selectedIndex = null;
+  document.getElementById("editor").classList.add("hidden");
+  renderList();
+}
+
+function addClass() {
+  const obj = {
+    InternalName: "NewClass",
+    Name: "New Class",
+    Games: 3,
+    Progress: 0,
+    Parameters: {}
+  };
+  db.Classes.push(obj);
+  renderList();
+}
+
+function deleteClass() {
+  if (selectedIndex === null) return;
+  if (!confirm("Delete this object?")) return;
+  db.Classes.splice(selectedIndex, 1);
+  selectedIndex = null;
+  document.getElementById("editor").classList.add("hidden");
+  renderList();
+}
+
+function editObject() {
+  const o = db.Objects[selectedIndex];
+  editor.innerHTML = `<h2>Object</h2>`;
+
+  for (const [key, def] of Object.entries(objectFieldSchema)) {
+    const value = o[key];
+
+    if (def.type === "text") {
+      editor.innerHTML += `
+      <label>${key}
+        <input id="obj_${key}" value="${value ?? ""}">
+      </label>`;
+    }
+
+    if (def.type === "textarea") {
+      editor.innerHTML += `
+      <label>${key}
+        <textarea id="obj_${key}">${value ?? ""}</textarea>
+      </label>`;
+    }
+
+    if (def.type === "checkbox") {
+      editor.innerHTML += `
+      <label>
+        <input type="checkbox" id="obj_${key}" ${value ? "checked" : ""}>
+        ${key}
+      </label>`;
+    }
+
+    if (def.type === "select") {
+      let options = [];
+
+      if (def.dynamicOptions === "classes") {
+        options = [{ v: "", t: "(none)" }, ...getClassOptions()];
+      } else {
+        options = def.options.map(o2 =>
+          typeof o2 === "string"
+            ? { v: o2, t: o2 || "(none)" }
+            : o2
+        );
+      }
+
+      editor.innerHTML += `
+      <label>${key}
+        <select id="obj_${key}">
+          ${options.map(o2 =>
+            `<option value="${o2.v}">${o2.t}</option>`
+          ).join("")}
+        </select>
+      </label>`;
+    }
+  }
+
+  editor.innerHTML += `
+    <button onclick="saveObject()">Save Object</button>
+    <button class="danger" onclick="deleteObject()">Delete Object</button>
+  `;
+
+  // Set select values AFTER insertion
+  for (const key of Object.keys(objectFieldSchema)) {
+    const el = document.getElementById(`obj_${key}`);
+    if (!el || o[key] === undefined) continue;
+    el.value = o[key];
+  }
+}
+
+function saveObject() {
+  const o = db.Objects[selectedIndex];
+
+  for (const [key, def] of Object.entries(objectFieldSchema)) {
+    const el = document.getElementById(`obj_${key}`);
+    if (!el) continue;
+
+    if (def.type === "checkbox") {
+      o[key] = el.checked;
+    } else if (el.value === "") {
+      delete o[key];
+    } else {
+      o[key] = (def.type === "select" && !isNaN(el.value))
+        ? Number(el.value)
+        : el.value;
+    }
+  }
+
+  renderList();
+}
+
+/* ================= CLASS + PARAMETER EDITOR ================= */
+
+function editClass() {
+    const c = db.Classes[selectedIndex];
+    editor.innerHTML = `<h2>Class</h2>
+
+<label>Internal Name
+<input id="clsInternal" value="${c.InternalName || ""}">
+</label>
+
+<label>Name
+<input id="clsName" value="${c.Name || ""}">
+</label>
+
+<label>Notes
+<textarea id="clsNotes">${c.Notes || ""}</textarea>
+</label>
+
+<button onclick="saveClass()">Save Class</button>
+
+<fieldset>
+<legend>Parameters</legend>
+<div id="paramList"></div>
+<button onclick="addParameter()">Add Parameter</button>
+</fieldset>
+
+<div id="paramEditor"></div>
+`;
+
+    renderParameters();
+}
+
+function saveClass() {
+    const c = db.Classes[selectedIndex];
+    c.InternalName = clsInternal.value;
+    c.Name = clsName.value;
+    c.Notes = clsNotes.value;
+    renderList();
+}
+
+function renderParameters() {
+    const c = db.Classes[selectedIndex];
+    paramList.innerHTML = "";
+    if (!c.Parameters) c.Parameters = {};
+
+    Object.keys(c.Parameters).forEach(p => {
+        const d = document.createElement("div");
+        d.textContent = p;
+        d.onclick = () => editParameter(p);
+        paramList.appendChild(d);
+    });
+}
+
+function addParameter() {
+    const name = prompt("Internal parameter name (e.g. Obj_arg0)");
+    if (!name) return;
+    db.Classes[selectedIndex].Parameters[name] = {
+        Name: "",
+        Games: 3,
+        Needed: false,
+        Description: "",
+        Values: [],
+        Exclusives: []
+    };
+    renderParameters();
+    editParameter(name);
+}
+
+function editParameter(name) {
+    selectedParam = name;
+    const p = db.Classes[selectedIndex].Parameters[name];
+
+    paramEditor.innerHTML = `
+<fieldset>
+<legend>Parameter: ${name}</legend>
+
+<label>Readable Name
+<input id="pName" value="${p.Name || ""}">
+</label>
+
+<label>Games
+<select id="pGames">
+<option value="1">SMG1</option>
+<option value="2">SMG2</option>
+<option value="3">Both</option>
+</select>
+</label>
+
+<label>
+<input type="checkbox" id="pNeeded" ${p.Needed ? "checked" : ""}> Needed
+</label>
+
+<label>Description
+<textarea id="pDesc">${p.Description || ""}</textarea>
+</label>
+
+<h4>Values</h4>
+<div id="values"></div>
+<button onclick="addValue()">Add Value</button>
+
+<button onclick="saveParameter()">Save Parameter</button>
+<button class="danger" onclick="deleteParameter()">Delete Parameter</button>
+</fieldset>
+`;
+
+    pGames.value = p.Games;
+    renderValues();
+}
+
+function renderValues() {
+    const p = db.Classes[selectedIndex].Parameters[selectedParam];
+    values.innerHTML = "";
+    p.Values.forEach((v, i) => {
+        values.innerHTML += `
+<div class="valueRow">
+<input value="${v.Value}">
+<input value="${v.Notes || ""}">
+<button onclick="removeValue(${i})">✖</button>
+</div>`;
+    });
+}
+
+function addValue() {
+    db.Classes[selectedIndex].Parameters[selectedParam].Values.push({ Value: "", Notes: "" });
+    renderValues();
+}
+
+function removeValue(i) {
+    db.Classes[selectedIndex].Parameters[selectedParam].Values.splice(i, 1);
+    renderValues();
+}
+
+function saveParameter() {
+    const p = db.Classes[selectedIndex].Parameters[selectedParam];
+    p.Name = pName.value;
+    p.Games = Number(pGames.value);
+    p.Needed = pNeeded.checked;
+    p.Description = pDesc.value;
+
+    const rows = values.querySelectorAll(".valueRow");
+    p.Values = [...rows].map(r => ({
+        Value: r.children[0].value,
+        Notes: r.children[1].value
+    }));
+}
+
+function deleteParameter() {
+    if (!confirm("Delete parameter?")) return;
+    delete db.Classes[selectedIndex].Parameters[selectedParam];
+    paramEditor.innerHTML = "";
+    renderParameters();
+}
+
+/* ================= DOWNLOAD ================= */
+
+function downloadJSON() {
+    const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "smg_object_database.json";
+    a.click();
+}
+</script>
+
+</body>
+</html>
