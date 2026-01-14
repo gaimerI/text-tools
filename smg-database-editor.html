@@ -504,7 +504,7 @@ function addClass() {
 
 function deleteClass() {
   if (selectedIndex === null) return;
-  if (!confirm("Delete this object?")) return;
+  if (!confirm("Delete this class?")) return;
   db.Classes.splice(selectedIndex, 1);
   selectedIndex = null;
   document.getElementById("editor").classList.add("hidden");
@@ -617,6 +617,7 @@ function editClass() {
 </label>
 
 <button onclick="saveClass()">Save Class</button>
+<button onclick="deleteClass()" class="danger">Delete Class</button>
 
 <fieldset>
 <legend>Parameters</legend>
