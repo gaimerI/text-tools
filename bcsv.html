@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+body {
+    font-family: sans-serif;
+    background: #1e1e1e;
+    color: #ddd;
+    margin: 0;
+}
+header {
+    background: #2c2c2c;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+main {
+    display: flex;
+    height: calc(100vh - 50px);
+}
+#sidebar {
+    width: 30%;
+    background: #252525;
+    display: flex;
+    flex-direction: column;
+}
+#tabs, #adds {
+    display: flex;
+}
+#tabs button {
+    flex: 1;
+    background: #333;
+    border: none;
+    color: white;
+    padding: 8px;
+}
+#tabs button.active {
+    background: #3a6ea5;
+}
+#list {
+    flex: 1;
+    overflow-y: auto;
+}
+#list div {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+#list div:hover {
+    background: #333;
+}
+#list .active {
+    background: #3a6ea5;
+}
+#editor {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+label {
+    display: block;
+    margin-top: 8px;
+}
+input, select, textarea {
+    width: 100%;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 4px;
+}
+fieldset {
+    border: 1px solid #444;
+    margin-top: 12px;
+}
+legend {
+    color: #aaa;
+}
+button {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: none;
+    color: white;
+    background: #3a6ea5;
+}
+button.danger {
+    background: #a53a3a;
+}
+.valueRow {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+}
+.valueRow input {
+    flex: 1;
+}
+    </style>
+  </head>
+  <body>
+    <input id="fileInput" type="file" accept=".bcsv" />
+    <script>
+const fileInput = document.getElementById('fileInput');
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const buffer = await file.arrayBuffer();
+  
+  const bcsv = parseBCSV(buffer);
+
+  console.log(bcsv.header);
+  console.log(bcsv.fields);
+  console.log(bcsv.entries);
+});
+
+function parseBCSV(arrayBuffer) {
+    const view = new DataView(arrayBuffer);
+    let offset = 0;
+
+    // ---------- Helpers ----------
+    const u8  = () => view.getUint8(offset++);
+    const u16 = () => (offset += 2, view.getUint16(offset - 2, false));
+    const u32 = () => (offset += 4, view.getUint32(offset - 4, false));
+    const s32 = () => (offset += 4, view.getInt32(offset - 4, false));
+    const f32 = () => (offset += 4, view.getFloat32(offset - 4, false));
+
+    const readString = (start) => {
+        let end = start;
+        while (view.getUint8(end) !== 0) end++;
+        const bytes = new Uint8Array(arrayBuffer, start, end - start);
+        // SHIFT-JIS decoding (browser + modern Node)
+        return new TextDecoder("shift-jis").decode(bytes);
+    };
+
+    // ---------- Header ----------
+    const header = {
+        entryCount: u32(),
+        fieldCount: u32(),
+        entryDataOffset: u32(),
+        entrySize: u32()
+    };
+
+    // ---------- Fields ----------
+    const fields = [];
+    for (let i = 0; i < header.fieldCount; i++) {
+        const field = {
+            nameHash: u32(),
+            bitmask: u32(),
+            entryOffset: u16(),
+            shift: u8(),
+            type: u8()
+        };
+        fields.push(field);
+    }
+
+    // ---------- Entries ----------
+    const entries = [];
+    const stringPoolStart =
+        header.entryDataOffset + header.entryCount * header.entrySize;
+
+    for (let i = 0; i < header.entryCount; i++) {
+        const entryBase =
+            header.entryDataOffset + i * header.entrySize;
+
+        const entry = {};
+
+        for (const field of fields) {
+            offset = entryBase + field.entryOffset;
+
+            let value;
+
+            switch (field.type) {
+                case 0x00: // LONG
+                case 0x03: // LONG_2
+                    value = s32();
+                    value = (value & field.bitmask) >>> field.shift;
+                    break;
+
+                case 0x02: // FLOAT
+                    value = f32();
+                    break;
+
+                case 0x04: // SHORT
+                    value = u16();
+                    value = (value & field.bitmask) >>> field.shift;
+                    break;
+
+                case 0x05: // CHAR
+                    value = u8();
+                    value = (value & field.bitmask) >>> field.shift;
+                    break;
+
+                case 0x01: // STRING (embedded, deprecated)
+                    {
+                        const bytes = new Uint8Array(
+                            arrayBuffer,
+                            offset,
+                            32
+                        );
+                        const zero = bytes.indexOf(0);
+                        value = new TextDecoder("shift-jis")
+                            .decode(zero === -1 ? bytes : bytes.slice(0, zero));
+                    }
+                    break;
+
+                case 0x06: // STRING_OFFSET
+                    {
+                        const strOffset = u32();
+                        value = strOffset === 0
+                            ? ""
+                            : readString(stringPoolStart + strOffset);
+                    }
+                    break;
+
+                default:
+                    value = null;
+                    break;
+            }
+
+            // Use hash as key (can be mapped to names later)
+            entry[field.nameHash.toString(16)] = value;
+        }
+
+        entries.push(entry);
+    }
+
+    return {
+        header,
+        fields,
+        entries
+    };
+}
+    </script>
+  </body>
+</html>
