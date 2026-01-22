@@ -395,7 +395,7 @@ function renderObjectFilters() {
     objectFilters.leftover = e.target.checked;
     renderList();
   };
-  const debouncedRender = debounce(renderList, 2000);
+  const debouncedRender = debounce(renderList, 1000);
   filterSearch.addEventListener('input', e => {
     objectFilters.search = e.target.value.trim().toLowerCase();
     debouncedRender();
@@ -642,12 +642,19 @@ function saveClass() {
 function renderParameters() {
     const c = db.Classes[selectedIndex];
     paramList.innerHTML = "";
-    if (!c.Parameters) c.Parameters = {};
 
-    Object.keys(c.Parameters).forEach(p => {
+    Object.entries(c.Parameters).forEach(([internal, param]) => {
+        const readable = param.Name?.trim();
+
+        let label = internal;
+        if (readable && readable !== internal) {
+            label += ` (${readable})`;
+        }
+
         const d = document.createElement("div");
-        d.textContent = p;
-        d.onclick = () => editParameter(p);
+        d.textContent = label;
+        d.onclick = () => editParameter(internal);
+
         paramList.appendChild(d);
     });
 }
